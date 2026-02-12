@@ -10,7 +10,7 @@ const OutputSchema = z.object({
   title: z.string().min(1).max(80),
   preview: z.string().min(1).max(140),
   letter: z.string().min(60).max(5000),
-  ps: z.string().max(180).optional().default("")
+  ps: z.string().max(500).optional().default("")
 });
 
 function buildPrompt(input: any) {
