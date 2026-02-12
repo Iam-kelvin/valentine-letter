@@ -1,8 +1,9 @@
-import Groq from "groq-sdk";
+import OpenAI from "openai";
 import { z } from "zod";
 
-const groq = new Groq({
+const client = new OpenAI({
   apiKey: process.env.GROQ_API_KEY!,
+  baseURL: "https://api.groq.com/openai/v1"
 });
 
 const OutputSchema = z.object({
@@ -55,7 +56,7 @@ Letter MUST end with:
 }
 
 export async function generateLetterWithGroq(input: any) {
-  const resp = await groq.chat.completions.create({
+  const resp = await client.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     temperature: 0.7,
     messages: [{ role: "user", content: buildPrompt(input) }],
