@@ -3,6 +3,7 @@ import { z } from "zod";
 import { generateLetterWithGroq } from "@/lib/groq-letter";
 import { saveLetter } from "@/lib/db";
 import { hashPassword } from "@/lib/letter-auth";
+import { slugify, shortId } from "@/lib/slug";
 
 const InputSchema = z.object({
   senderName: z.string().min(1),
@@ -34,7 +35,8 @@ export async function POST(req: Request) {
 
     const out = await generateLetterWithGroq(input);
 
-    const slug = crypto.randomUUID().slice(0, 8);
+    const base = slugify(out.title || `${input.senderName}-to-${input.recipientName}`);
+    const slug = `${base}-${shortId(4)}`;
     const passwordHash = input.password ? hashPassword(input.password) : null;
 
     await saveLetter({
