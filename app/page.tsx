@@ -44,10 +44,6 @@ export default function HomePage() {
           <span>⏳ Expiry optional</span>
           <span>🔗 Shareable link</span>
         </div>
-
-        <p style={{ marginTop: 28, fontSize: 12, opacity: 0.55 }}>
-          Powered by Groq • Built on Next.js • Hosted on Vercel
-        </p>
       </div>
     </main>
   );
