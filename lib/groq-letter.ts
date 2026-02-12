@@ -1,56 +1,74 @@
-// lib/groq-letter.ts
-import Groq from "groq-sdk";
+import OpenAI from "openai";
 import { z } from "zod";
+
+const client = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY!,
+  baseURL: "https://api.groq.com/openai/v1"
+});
 
 const OutputSchema = z.object({
   title: z.string().min(1).max(80),
   preview: z.string().min(1).max(140),
   letter: z.string().min(60).max(5000),
-  ps: z.string().max(180).optional().default(""),
+  ps: z.string().max(180).optional().default("")
 });
 
-function getGroqClient() {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    throw new Error("Missing GROQ_API_KEY env var");
-  }
-  return new Groq({ apiKey });
+function buildPrompt(input: any) {
+  const list = (label: string, arr?: string[]) =>
+    arr?.length ? `${label}:\n${arr.map((x) => `- ${x}`).join("\n")}\n` : "";
+
+  const spicyRule =
+    input.tone === "spicy_pg13"
+      ? `Keep it flirty/suggestive but PG-13 only. No explicit sex words/anatomy.\n`
+      : "";
+
+  return `
+Write a Valentine letter.
+
+Return ONLY valid JSON with keys:
+"title", "preview", "letter", "ps"
+
+Rules:
+- Use senderName and recipientName exactly.
+- No placeholders like [name].
+- No mention of AI/policies.
+- No manipulation, threats, insults.
+- Max 2 emojis.
+${spicyRule}
+
+Inputs:
+senderName: ${input.senderName}
+recipientName: ${input.recipientName}
+relationshipType: ${input.relationshipType}
+tone: ${input.tone}
+length: ${input.length}
+privateDetailLevel: ${input.privateDetailLevel}
+
+${list("memories", input.memories)}
+${list("insideJokes", input.insideJokes)}
+${list("qualities", input.qualities)}
+${list("futurePlans", input.futurePlans)}
+${input.callToAction ? `callToAction: ${input.callToAction}\n` : ""}
+
+Letter MUST end with:
+— ${input.senderName}
+`.trim();
 }
 
-export async function generateLetterWithGroq(input: {
-  recipientName: string;
-  relationship: string;
-  tone: string;
-  length: "Short" | "Medium" | "Long";
-  detailLevel: string;
-  memory: string;
-  senderName: string;
-}) {
-  const groq = getGroqClient();
-
-  const prompt = `
-You are writing a Valentine's letter.
-
-Recipient: ${input.recipientName}
-Relationship: ${input.relationship}
-Tone: ${input.tone}
-Length: ${input.length}
-Detail level: ${input.detailLevel}
-Memory / Specific detail: ${input.memory}
-From: ${input.senderName}
-
-Return JSON ONLY with keys: title, preview, letter, ps.
-`;
-
-  const completion = await groq.chat.completions.create({
-    // Use a supported Groq production model:
+export async function generateLetterWithGroq(input: any) {
+  const resp = await client.chat.completions.create({
     model: "llama-3.3-70b-versatile",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.9,
-    response_format: { type: "json_object" },
+    temperature: 0.7,
+    messages: [{ role: "user", content: buildPrompt(input) }],
+    response_format: { type: "json_object" } as any
   });
 
-  const text = completion.choices[0]?.message?.content ?? "{}";
-  const parsed = JSON.parse(text);
-  return OutputSchema.parse(parsed);
+  const text = resp.choices[0]?.message?.content ?? "";
+  const parsed = OutputSchema.parse(JSON.parse(text));
+  return {
+    title: parsed.title,
+    preview: parsed.preview,
+    letter: parsed.letter,
+    ps: parsed.ps ?? ""
+  };
 }
