@@ -5,6 +5,7 @@ import { getLetter } from "@/lib/db";
 import { cookieNameForSlug, verifyAccessToken } from "@/lib/letter-auth";
 import Link from "next/link";
 import ShareButton from "@/components/ShareButton";
+import EnvelopeReveal from "@/components/EnvelopeReveal";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -53,17 +54,8 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
         ← Home
       </Link>
 
-      <div
-        style={{
-          marginTop: 18,
-          borderRadius: 20,
-          padding: "28px 26px",
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.10)",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.5)"
-        }}
-      >
-        {/* Header row */}
+      {/* Header */}
+      <div style={{ marginTop: 30 }}>
         <div
           style={{
             display: "flex",
@@ -88,28 +80,25 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
             <ShareButton />
           </div>
         </div>
-
-        {/* Divider */}
-        <div
-          style={{
-            height: 1,
-            background: "rgba(255,255,255,0.10)",
-            margin: "18px 0 22px"
-          }}
-        />
-
-        {/* Letter body */}
-        <article style={{ whiteSpace: "pre-wrap", fontSize: 20, lineHeight: 1.8, opacity: 0.92 }}>
-          {row.letter}
-        </article>
-
-        {row.ps?.trim() ? (
-          <p style={{ marginTop: 20, fontStyle: "italic", opacity: 0.85 }}>
-            PS: {row.ps}
-          </p>
-        ) : null}
       </div>
+
+      {/* Divider */}
+      <div
+        style={{
+          height: 1,
+          background: "rgba(255,255,255,0.10)",
+          margin: "24px 0 40px"
+        }}
+      />
+
+      {/* Letter */}
+      <EnvelopeReveal
+        title={row.title}
+        preview={row.preview}
+        letter={row.letter}
+        ps={row.ps}
+      />
     </div>
   </main>
-  );
+);
 }
