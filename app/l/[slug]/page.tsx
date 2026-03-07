@@ -97,6 +97,10 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
         preview={row.preview}
         letter={row.letter}
         ps={row.ps}
+        ctaHref={`/create/${row.occasion || "love"}`}
+        ctaTitle="Aww 😌 Want one like this?"
+        ctaBody="Now go make one for your person in seconds."
+        ctaButtonText="Create my letter 💌"
       />
     </div>
   </main>

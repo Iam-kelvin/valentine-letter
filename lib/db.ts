@@ -2,6 +2,7 @@ import { sql } from "@vercel/postgres";
 
 export async function saveLetter(data: {
   slug: string;
+  occasion: string;
   title: string;
   preview: string;
   letter: string;
@@ -13,12 +14,13 @@ export async function saveLetter(data: {
 }) {
   await sql`
     INSERT INTO letters (
-      slug, title, preview, letter, ps,
+      slug, occasion, title, preview, letter, ps,
       sender_name, recipient_name,
       password_hash, expires_at
     )
     VALUES (
       ${data.slug},
+      ${data.occasion},
       ${data.title},
       ${data.preview},
       ${data.letter},
