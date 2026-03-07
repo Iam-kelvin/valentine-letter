@@ -841,6 +841,7 @@ const selectStyle: React.CSSProperties = {
   color: "inherit",
   fontSize: 14,
   outline: "none",
+  colorScheme: "dark",
 };
 
 const textareaStyle: React.CSSProperties = {
