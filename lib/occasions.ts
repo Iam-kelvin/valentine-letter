@@ -1,6 +1,7 @@
 export type OccasionKey =
   | "love"
   | "mothers-day"
+  | "womens-day"
   | "birthday"
   | "appreciation"
   | "just-because";
@@ -54,12 +55,14 @@ export const OCCASIONS = {
     ],
     recipientTypes: [
       "My Mother",
-      "My Wife (mother of my children)",
+      "My Wife",
       "Expecting Mother",
       "Single Mother",
       "Grandmother",
       "Church Mother",
       "Mother Figure",
+      "Future Mother",
+      "A Woman Who Will Make a Great Mother"
     ],
     tones: [
       "Heartfelt",
@@ -70,6 +73,41 @@ export const OCCASIONS = {
       "Lighthearted",
     ],
   },
+
+  "womens-day": {
+  key: "womens-day",
+  label: "Women’s Day",
+  emoji: "🌷",
+  title: "Create a Women’s Day Message",
+  subtitle: "Celebrate the strength, beauty, and impact of women.",
+  buttonText: "Create a Women’s Day message",
+  path: "/create/womens-day",
+  senderRoles: [
+    "Friend",
+    "Partner",
+    "Sibling",
+    "Child",
+    "Colleague",
+    "Mentor",
+    "Other",
+  ],
+  recipientTypes: [
+    "Friend",
+    "Sister",
+    "Partner",
+    "Mother",
+    "Mentor",
+    "Colleague",
+    "Woman I admire",
+  ],
+  tones: [
+    "Appreciative",
+    "Empowering",
+    "Inspirational",
+    "Celebratory",
+    "Heartfelt",
+  ],
+},
 
   birthday: {
     key: "birthday",

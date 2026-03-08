@@ -282,6 +282,15 @@ function getSuggestions(occasionKey: string) {
         cta: 'e.g., "Happy Mother’s Day, Mom. I love you always."',
       };
 
+    case "womens-day":
+      return {
+        memories: "- Moments where you inspired me\n- Times you showed strength\n- Ways you’ve impacted my life",
+        insideJokes: "- Funny moments we've shared\n- Little things that always make me smile",
+        qualities: "- Strong\n- Intelligent\n- Kind\n- Resilient",
+        futurePlans: "- Watching you achieve your dreams\n- Celebrating more wins with you\n- Supporting you always",
+        cta: 'e.g., "Happy Women’s Day. Keep shining and being incredible."',
+      };
+
     case "birthday":
       return {
         memories: "- Our favorite memories together\n- The best birthday we shared\n- Fun moments I’ll never forget",
