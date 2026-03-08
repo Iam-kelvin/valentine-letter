@@ -13,9 +13,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Valentine's Letter App",
-  description: "Created with Love by iKelvin",
+export const metadata = {
+  title: "Send With Love",
+  description: "Create beautiful, personal letters for birthdays, mothers, love, and more in seconds.",
+  // openGraph: {
+  //   title: "Send With Love",
+  //   description:
+  //     "Create meaningful letters for any occasion in seconds.",
+  //   url: "https://sendwithlove.app",
+  //   siteName: "Send With Love",
+  // },
 };
 
 export default function RootLayout({
