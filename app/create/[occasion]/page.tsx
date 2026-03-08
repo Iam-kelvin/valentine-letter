@@ -512,7 +512,7 @@ export default function OccasionCreatePage() {
                 >
                   <option value="">Choose relationship</option>
                   {occasion.senderRoles.map((role) => (
-                    <option key={role} value={role}>
+                    <option key={role} value={role} style={optionStyle}>
                       {role}
                     </option>
                   ))}
@@ -542,9 +542,9 @@ export default function OccasionCreatePage() {
                   onChange={(e) => setLength(e.target.value as Length)}
                   style={selectStyle}
                 >
-                  <option value="short">Short</option>
-                  <option value="medium">Medium</option>
-                  <option value="long">Long</option>
+                  <option value="short" style={optionStyle}>Short</option>
+                  <option value="medium" style={optionStyle}>Medium</option>
+                  <option value="long" style={optionStyle}>Long</option>
                 </select>
               </div>
             </div>
@@ -566,7 +566,7 @@ export default function OccasionCreatePage() {
                 >
                   <option value="">Choose sender</option>
                   {occasion.senderRoles.map((role) => (
-                    <option key={role} value={role}>
+                    <option key={role} value={role} style={optionStyle}>
                       {role}
                     </option>
                   ))}
@@ -582,7 +582,7 @@ export default function OccasionCreatePage() {
                 >
                   <option value="">Choose recipient</option>
                   {occasion.recipientTypes.map((type) => (
-                    <option key={type} value={type}>
+                    <option key={type} value={type} style={optionStyle}>
                       {type}
                     </option>
                   ))}
@@ -598,7 +598,7 @@ export default function OccasionCreatePage() {
                 >
                   <option value="">Choose tone</option>
                   {occasion.tones.map((t) => (
-                    <option key={t} value={t}>
+                    <option key={t} value={t} style={optionStyle}>
                       {t}
                     </option>
                   ))}
@@ -614,9 +614,9 @@ export default function OccasionCreatePage() {
               onChange={(e) => setPrivateDetailLevel(e.target.value as Privacy)}
               style={selectStyle}
             >
-              <option value="low">Low detail</option>
-              <option value="medium">Medium detail</option>
-              <option value="high">High detail</option>
+              <option value="low" style={optionStyle}>Low detail</option>
+              <option value="medium" style={optionStyle}>Medium detail</option>
+              <option value="high" style={optionStyle}>High detail</option>
             </select>
           </div>
         </section>
@@ -722,9 +722,9 @@ export default function OccasionCreatePage() {
                 onChange={(e) => setExpiryMode(e.target.value as any)}
                 style={selectStyle}
               >
-                <option value="never">No expiry</option>
-                <option value="24h">Expires in 24 hours</option>
-                <option value="7d">Expires in 7 days</option>
+                <option value="never" style={optionStyle}>No expiry</option>
+                <option value="24h" style={optionStyle}>Expires in 24 hours</option>
+                <option value="7d" style={optionStyle}>Expires in 7 days</option>
               </select>
             </div>
           </div>
@@ -846,11 +846,24 @@ const selectStyle: React.CSSProperties = {
   padding: "12px 14px",
   borderRadius: 12,
   border: "1px solid rgba(255,255,255,0.14)",
-  background: "rgba(255,255,255,0.06)",
-  color: "inherit",
+  background: "rgba(0,0,0,0.6)",
+  color: "white",
   fontSize: 14,
   outline: "none",
+  WebkitAppearance: "none",
+  MozAppearance: "none",
+  appearance: "none",
+  backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "right 12px center",
+  backgroundSize: "18px",
+  paddingRight: "38px",
   colorScheme: "dark",
+};
+
+const optionStyle: React.CSSProperties = {
+  background: "#111",
+  color: "white",
 };
 
 const textareaStyle: React.CSSProperties = {
