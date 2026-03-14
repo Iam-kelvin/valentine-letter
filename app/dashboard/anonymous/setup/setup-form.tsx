@@ -42,7 +42,7 @@ export default function SetupForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} style={{ ...anonCardStyle, display: "grid", gap: 16 }}>
+    <form onSubmit={onSubmit} style={{ ...anonCardStyle, display: "grid", gap: 14 }}>
       <input
         value={username}
         onChange={(e) => setUsername(e.target.value)}
@@ -50,12 +50,14 @@ export default function SetupForm() {
         required
         style={anonInputStyle}
       />
+
       <input
         value={displayName}
         onChange={(e) => setDisplayName(e.target.value)}
         placeholder="Display name (optional)"
         style={anonInputStyle}
       />
+
       <textarea
         value={bio}
         onChange={(e) => setBio(e.target.value)}
@@ -63,9 +65,11 @@ export default function SetupForm() {
         rows={4}
         style={anonTextareaStyle}
       />
+
       <button type="submit" disabled={loading} style={anonButtonStyle}>
         {loading ? "Saving..." : "Create my link"}
       </button>
+
       {err ? <p style={{ color: "#ff8ea1", margin: 0 }}>{err}</p> : null}
     </form>
   );

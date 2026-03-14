@@ -3,19 +3,19 @@ import type { CSSProperties } from "react";
 export const anonPageStyle: CSSProperties = {
   minHeight: "100vh",
   background:
-    "radial-gradient(circle at top, rgba(255, 71, 133, 0.18), transparent 30%), radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.12), transparent 30%), #09090b",
+    "radial-gradient(circle at top, rgba(255, 71, 133, 0.16), transparent 28%), radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.10), transparent 28%), #09090b",
   color: "#fff",
-  padding: "32px 20px",
+  padding: "28px 20px 40px",
 };
 
 export const anonWrapStyle: CSSProperties = {
-  maxWidth: 860,
+  maxWidth: 1200,
   margin: "0 auto",
 };
 
 export const anonHeroStyle: CSSProperties = {
   textAlign: "center",
-  marginBottom: 28,
+  marginBottom: 20,
 };
 
 export const anonBadgeStyle: CSSProperties = {
@@ -29,7 +29,7 @@ export const anonBadgeStyle: CSSProperties = {
 };
 
 export const anonTitleStyle: CSSProperties = {
-  fontSize: 48,
+  fontSize: 64,
   lineHeight: 1.05,
   margin: "0 0 10px",
   letterSpacing: "-0.02em",
@@ -42,20 +42,20 @@ export const anonSubtitleStyle: CSSProperties = {
 };
 
 export const anonCardStyle: CSSProperties = {
-  borderRadius: 24,
+  borderRadius: 26,
   border: "1px solid rgba(255,255,255,0.10)",
-  background: "rgba(255,255,255,0.05)",
-  boxShadow: "0 20px 60px rgba(0,0,0,0.28)",
-  padding: 24,
+  background: "rgba(255,255,255,0.04)",
+  boxShadow: "0 20px 60px rgba(0,0,0,0.24)",
+  padding: 22,
   backdropFilter: "blur(8px)",
 };
 
 export const anonInputStyle: CSSProperties = {
   width: "100%",
   padding: "16px 18px",
-  borderRadius: 16,
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.06)",
+  borderRadius: 18,
+  border: "1px solid rgba(255,255,255,0.18)",
+  background: "rgba(255,255,255,0.08)",
   color: "#fff",
   fontSize: 16,
   outline: "none",
@@ -64,7 +64,7 @@ export const anonInputStyle: CSSProperties = {
 export const anonTextareaStyle: CSSProperties = {
   ...anonInputStyle,
   resize: "vertical",
-  minHeight: 140,
+  minHeight: 180,
 };
 
 export const anonButtonStyle: CSSProperties = {
@@ -89,13 +89,13 @@ export const anonSecondaryButtonStyle: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   gap: 8,
-  padding: "14px 22px",
+  padding: "12px 18px",
   borderRadius: 999,
   border: "1px solid rgba(255,255,255,0.14)",
   background: "rgba(255,255,255,0.06)",
   color: "#fff",
   fontWeight: 600,
-  fontSize: 16,
+  fontSize: 15,
   textDecoration: "none",
   cursor: "pointer",
 };

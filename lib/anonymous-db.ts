@@ -101,3 +101,41 @@ export async function logAnonymousRateLimitHit(input: {
     VALUES (${input.ip}, ${input.profileId});
   `;
 }
+
+export async function getArchivedAnonymousMessagesForUser(userId: string) {
+  const rows = await sql`
+    SELECT m.*
+    FROM anonymous_messages m
+    JOIN anonymous_profiles p ON p.id = m.profile_id
+    WHERE p.user_id = ${userId}
+      AND m.is_deleted = FALSE
+      AND m.is_archived = TRUE
+    ORDER BY m.created_at DESC;
+  `;
+  return rows;
+}
+
+export async function unarchiveAnonymousMessage(input: {
+  messageId: number;
+  userId: string;
+}) {
+  const rows = await sql`
+    UPDATE anonymous_messages m
+    SET is_archived = FALSE
+    FROM anonymous_profiles p
+    WHERE m.profile_id = p.id
+      AND p.user_id = ${input.userId}
+      AND m.id = ${input.messageId}
+    RETURNING m.*;
+  `;
+  return rows[0] ?? null;
+}
+
+export async function getAnonymousProfileById(id: number) {
+  const rows = await sql`
+    SELECT * FROM anonymous_profiles
+    WHERE id = ${id}
+    LIMIT 1;
+  `;
+  return rows[0] ?? null;
+}

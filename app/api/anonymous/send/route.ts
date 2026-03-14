@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { auth } from "@clerk/nextjs/server";
 import {
   createAnonymousMessage,
-  checkAnonymousRateLimit,
-  logAnonymousRateLimitHit,
+  getAnonymousProfileById,
 } from "@/lib/anonymous-db";
 
 const BodySchema = z.object({
@@ -17,18 +17,18 @@ export async function POST(req: Request) {
     const body = await req.json();
     const input = BodySchema.parse(body);
 
-    const forwardedFor = req.headers.get("x-forwarded-for");
-    const ip = forwardedFor?.split(",")[0]?.trim() || "unknown";
+    const targetProfile = await getAnonymousProfileById(input.profileId);
 
-    const allowed = await checkAnonymousRateLimit({
-      ip,
-      profileId: input.profileId,
-    });
+    if (!targetProfile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
 
-    if (!allowed) {
+    const { userId } = await auth();
+
+    if (userId && targetProfile.user_id === userId) {
       return NextResponse.json(
-        { error: "Too many messages sent recently. Please try again later." },
-        { status: 429 }
+        { error: "You cannot send anonymous messages to yourself." },
+        { status: 400 }
       );
     }
 
@@ -36,11 +36,6 @@ export async function POST(req: Request) {
       profileId: input.profileId,
       message: input.message,
       senderHint: input.senderHint,
-    });
-
-    await logAnonymousRateLimitHit({
-      ip,
-      profileId: input.profileId,
     });
 
     return NextResponse.json({ ok: true, id: message.id });

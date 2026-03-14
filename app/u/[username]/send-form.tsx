@@ -65,8 +65,8 @@ export default function AnonymousSendForm({
   if (done) {
     return (
       <div style={{ ...anonCardStyle, textAlign: "center" }}>
-        <div style={{ fontSize: 42, marginBottom: 12 }}>✅</div>
-        <p style={{ fontSize: 22, marginTop: 0 }}>Message sent anonymously</p>
+        <div style={{ fontSize: 38, marginBottom: 12 }}>✅</div>
+        <p style={{ fontSize: 20, marginTop: 0 }}>Message sent anonymously</p>
         <p style={{ opacity: 0.8, marginBottom: 20 }}>
           Want your own anonymous inbox link too?
         </p>
@@ -91,12 +91,12 @@ export default function AnonymousSendForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ ...anonCardStyle, display: "grid", gap: 16 }}>
+    <form onSubmit={handleSubmit} style={{ ...anonCardStyle, display: "grid", gap: 14 }}>
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder={`Write something anonymous to @${username}`}
-        rows={7}
+        rows={6}
         required
         disabled={loading}
         style={anonTextareaStyle}
