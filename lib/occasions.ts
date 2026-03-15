@@ -46,11 +46,17 @@ export const OCCASIONS = {
     senderRoles: [
       "Son",
       "Daughter",
+      "Niece",
+      "Nephew",
+      "Brother",
+      "Sister",
       "Husband / Partner",
       "Boyfriend",
       "Friend",
-      "Family Member",
+      "Family Friend",
       "Church Member",
+      "Future father of your children",
+      "Mentor",
       "Other",
     ],
     recipientTypes: [
