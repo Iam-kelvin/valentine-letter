@@ -44,6 +44,7 @@ export default function RootLayout({
           color: "#fff",
         }}
       >
+        {/* <SiteNav /> */}
         {children}
         <Analytics />
       </body>

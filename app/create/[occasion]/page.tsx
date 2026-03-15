@@ -455,7 +455,7 @@ export default function OccasionCreatePage() {
         </p>
       </div>
 
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 16 }}>
+      <form onSubmit={onSubmit} autoComplete="off" style={{ display: "grid", gap: 16 }}>
         {/* Card 1 */}
         <section
           style={{
@@ -666,10 +666,13 @@ export default function OccasionCreatePage() {
           <div style={{ marginTop: 18 }}>
             <label style={labelStyle}>Call-to-action (optional)</label>
             <input
-              value={callToAction}
-              onChange={(e) => setCallToAction(e.target.value)}
-              placeholder={suggestions.cta}
-              style={inputStyle}
+               value={callToAction}
+               onChange={(e) => setCallToAction(e.target.value)}
+               placeholder={suggestions.cta}
+               style={inputStyle}
+               autoComplete="off"
+               name="letter_cta"
+               id="letter_cta"
             />
           </div>
           <div style={{ marginTop: 18 }}>
@@ -712,9 +715,11 @@ export default function OccasionCreatePage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Set a password to lock this letter"
                 style={inputStyle}
+                autoComplete="new-password"
+                name="letter_password"
+                id="letter_password"
               />
             </div>
-
             <div>
               <label style={labelStyle}>Expiry</label>
               <select
