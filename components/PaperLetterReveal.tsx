@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import LetterCelebration from "./LetterCelebration";
 
 type Props = {
   title: string;
@@ -74,6 +75,8 @@ export default function PaperLetterReveal({
   const [typedText, setTypedText] = useState("");
   const [typedPs, setTypedPs] = useState("");
   const [showSignature, setShowSignature] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+
 
   const signature = useMemo(
     () => buildSignature(senderRole, senderName),
@@ -86,7 +89,7 @@ export default function PaperLetterReveal({
     let cancelled = false;
     let i = 0;
     const fullText = letter || "";
-    const charDelay = 80;
+    const charDelay = 20;
 
     function next() {
       if (cancelled) return;
@@ -122,16 +125,30 @@ export default function PaperLetterReveal({
               setTimeout(nextPs, delay);
             } else {
               setTimeout(() => {
-                if (!cancelled) setShowSignature(true);
-              }, 220);
+  if (!cancelled) {
+    setShowSignature(true);
+    setShowCelebration(true);
+    setTimeout(() => {
+      setShowCelebration(false);
+    }, 3200);
+  }
+}, 220);
+
             }
           }
 
           nextPs();
         } else {
           setTimeout(() => {
-            if (!cancelled) setShowSignature(true);
-          }, 220);
+  if (!cancelled) {
+    setShowSignature(true);
+    setShowCelebration(true);
+    setTimeout(() => {
+      setShowCelebration(false);
+    }, 3200);
+  }
+}, 220);
+
         }
       }
     }
@@ -243,6 +260,7 @@ export default function PaperLetterReveal({
             overflow: "hidden",
           }}
         >
+            <LetterCelebration show={showCelebration} />
           <div
             style={{
               position: "absolute",
