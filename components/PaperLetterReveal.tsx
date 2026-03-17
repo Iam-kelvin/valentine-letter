@@ -77,6 +77,7 @@ export default function PaperLetterReveal({
   const [showSignature, setShowSignature] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
 
+  const letterContainerRef = useRef<HTMLDivElement | null>(null);
   const letterEndRef = useRef<HTMLDivElement | null>(null);
 
   const signature = useMemo(
@@ -90,7 +91,7 @@ export default function PaperLetterReveal({
     let cancelled = false;
     let i = 0;
     const fullText = letter || "";
-    const charDelay = 80;
+    const charDelay = 10;
 
     function next() {
       if (cancelled) return;
@@ -167,8 +168,28 @@ export default function PaperLetterReveal({
     }
   }, [typedText, typedPs]);
 
+  useEffect(() => {
+    const end = letterEndRef.current;
+    if (!end) return;
+
+    const rect = end.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+
+    // Start following when the typing point gets into the lower part of the screen
+    const triggerLine = viewportHeight * 0.72;
+
+    if (rect.top > triggerLine) {
+      const scrollAmount = rect.top - triggerLine;
+
+      window.scrollBy({
+        top: Math.min(scrollAmount, 72),
+        behavior: "smooth",
+      });
+    }
+  }, [typedText, typedPs]);
+
   return (
-    <div style={{ width: "100%" }}>
+    <div ref={letterContainerRef} style={{ width: "100%" }}>
       {!opened ? (
         <div
           onClick={() => setOpened(true)}
