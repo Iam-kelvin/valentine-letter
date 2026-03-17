@@ -91,7 +91,7 @@ export default function PaperLetterReveal({
     let cancelled = false;
     let i = 0;
     const fullText = letter || "";
-    const charDelay = 10;
+    const charDelay = 80;
 
     function next() {
       if (cancelled) return;
