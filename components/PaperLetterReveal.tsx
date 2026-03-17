@@ -176,13 +176,13 @@ export default function PaperLetterReveal({
     const viewportHeight = window.innerHeight;
 
     // Start following when the typing point gets into the lower part of the screen
-    const triggerLine = viewportHeight * 0.72;
+    const triggerLine = viewportHeight * 0.78;
 
     if (rect.top > triggerLine) {
       const scrollAmount = rect.top - triggerLine;
 
       window.scrollBy({
-        top: Math.min(scrollAmount, 72),
+        top: Math.min(scrollAmount, 40),
         behavior: "smooth",
       });
     }
