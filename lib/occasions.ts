@@ -62,6 +62,10 @@ export const OCCASIONS = {
     recipientTypes: [
       "My Mother",
       "My Wife",
+      "girlfriend",
+      "My Aunt",
+      "My Sister",
+      "My Mother-in-Law",
       "Expecting Mother",
       "Single Mother",
       "Grandmother",

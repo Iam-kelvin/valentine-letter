@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import LetterCelebration from "./LetterCelebration";
 
 type Props = {
@@ -77,6 +77,7 @@ export default function PaperLetterReveal({
   const [showSignature, setShowSignature] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
 
+  const letterEndRef = useRef<HTMLDivElement | null>(null);
 
   const signature = useMemo(
     () => buildSignature(senderRole, senderName),
@@ -125,30 +126,27 @@ export default function PaperLetterReveal({
               setTimeout(nextPs, delay);
             } else {
               setTimeout(() => {
-  if (!cancelled) {
-    setShowSignature(true);
-    setShowCelebration(true);
-    setTimeout(() => {
-      setShowCelebration(false);
-    }, 3200);
-  }
-}, 220);
-
+              if (!cancelled) {
+                setShowSignature(true);
+                setShowCelebration(true);
+                setTimeout(() => {
+                  setShowCelebration(false);
+                }, 3200);
+              }
+            }, 220);
             }
           }
-
           nextPs();
         } else {
           setTimeout(() => {
-  if (!cancelled) {
-    setShowSignature(true);
-    setShowCelebration(true);
-    setTimeout(() => {
-      setShowCelebration(false);
-    }, 3200);
-  }
-}, 220);
-
+            if (!cancelled) {
+              setShowSignature(true);
+              setShowCelebration(true);
+              setTimeout(() => {
+                setShowCelebration(false);
+            }, 3200);
+            }
+          }, 220);
         }
       }
     }
@@ -159,6 +157,15 @@ export default function PaperLetterReveal({
       cancelled = true;
     };
   }, [opened, letter, ps]);
+
+  useEffect(() => {
+    if (letterEndRef.current) {
+      letterEndRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [typedText, typedPs]);
 
   return (
     <div style={{ width: "100%" }}>
@@ -376,6 +383,8 @@ export default function PaperLetterReveal({
                 </div>
               </div>
             ) : null}
+
+            <div ref={letterEndRef} />
 
             <div
                 style={{

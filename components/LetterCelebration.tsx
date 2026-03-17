@@ -34,6 +34,19 @@ export default function LetterCelebration({ show }: Props) {
             opacity: 0;
           }
         }
+        @keyframes rainLove {
+          0% {
+            transform: translateY(-40px) scale(0.9) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(420px) scale(1.05) rotate(12deg);
+            opacity: 0;
+          }
+        }
       `}</style>
 
       <div
@@ -54,6 +67,21 @@ export default function LetterCelebration({ show }: Props) {
               left: item.left,
               fontSize: item.size,
               animation: `floatUpLove 2.8s ease-out ${item.delay} forwards`,
+              filter: "drop-shadow(0 8px 14px rgba(0,0,0,0.12))",
+            }}
+          >
+            {item.symbol}
+          </span>
+        ))}
+        {items.map((item, index) => (
+          <span
+            key={"top-" + index}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: item.left,
+              fontSize: item.size + 6,
+              animation: `rainLove 3s ease-out ${item.delay} forwards`,
               filter: "drop-shadow(0 8px 14px rgba(0,0,0,0.12))",
             }}
           >
