@@ -131,13 +131,7 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
           <PaperLetterReveal
             title={row.title}
             recipientLine={
-              row.occasion === "mothers-day"
-                ? (row as any).recipient_name
-                  ? `To the most wonderful mom, ${(row as any).recipient_name}:`
-                  : (row as any).recipientName
-                  ? `To the most wonderful mom, ${(row as any).recipientName}:`
-                  : "To the most wonderful mom in the world:"
-                : (row as any).recipient_name
+              (row as any).recipient_name
                 ? `To ${(row as any).recipient_name}:`
                 : (row as any).recipientName
                 ? `To ${(row as any).recipientName}:`
