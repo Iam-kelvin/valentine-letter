@@ -127,25 +127,31 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
           }}
         />
 
-        {isPaperOccasion ? (
+          {isPaperOccasion ? (
           <PaperLetterReveal
             title={row.title}
             recipientLine={
-              (row as any).recipient_name
-              ? `To the most wonderful mom, ${(row as any).recipient_name}`
-              : (row as any).recipientName
-              ? `To the most wonderful mom, ${(row as any).recipientName}`
-              : "To the most wonderful mom in the world"
-        }
-              preview={row.preview}
-              letter={row.letter}
-              ps={row.ps}
-              senderName={senderName}
-              senderRole={senderRole}
-              ctaHref={`/create/${row.occasion || "mothers-day"}`}
-              ctaTitle="Aww 😌 Want one like this?"
-              ctaBody="Now go make one for your person in seconds."
-              ctaButtonText="Create my letter 💌"
+              row.occasion === "mothers-day"
+                ? (row as any).recipient_name
+                  ? `To the most wonderful mom, ${(row as any).recipient_name}:`
+                  : (row as any).recipientName
+                  ? `To the most wonderful mom, ${(row as any).recipientName}:`
+                  : "To the most wonderful mom in the world:"
+                : (row as any).recipient_name
+                ? `To ${(row as any).recipient_name}:`
+                : (row as any).recipientName
+                ? `To ${(row as any).recipientName}:`
+                : "To you:"
+            }
+            preview={row.preview}
+            letter={row.letter}
+            ps={row.ps}
+            senderName={senderName}
+            senderRole={senderRole}
+            ctaHref={`/create/${row.occasion || "mothers-day"}`}
+            ctaTitle="Aww 😌 Want one like this?"
+            ctaBody="Now go make one for your person in seconds."
+            ctaButtonText="Create my letter 💌"
           />
         ) : (
           <EnvelopeReveal
