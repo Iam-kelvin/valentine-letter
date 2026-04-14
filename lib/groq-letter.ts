@@ -283,6 +283,84 @@ ${extraGirlfriendRule}
 `;
 }
 
+function buildQualityTierRules(input: any) {
+  const tier = input.qualityTier === "premium" ? "premium" : "standard";
+
+  if (tier === "premium") {
+    return `
+Quality tier: premium
+
+Premium writing rules:
+- The writing should feel deeply personal, natural, and emotionally believable.
+- Use more nuanced emotional pacing.
+- Vary sentence rhythm more intentionally.
+- Avoid generic greeting-card phrasing.
+- Avoid sounding overly polished or formulaic.
+- Let some lines feel intimate, lived-in, and slightly imperfect in a human way.
+- Use specific, grounded emotional observations when details are available.
+- Open with a stronger emotional hook.
+- End with a more memorable and moving closing.
+- Make the preview feel sharper, more elegant, and less generic.
+- The title should feel specific and emotionally appealing, not templated.
+`;
+  }
+
+  return `
+Quality tier: standard
+
+Standard writing rules:
+- Keep the writing warm, clear, natural, and emotionally pleasant.
+- Avoid obvious clichés where possible.
+- Keep the structure simple and readable.
+- Make the title and preview clear and appropriate.
+`;
+}
+
+function buildLanguageRules(input: any) {
+  const mode = input.languageMode || "english";
+  const nativeLanguage = String(input.nativeLanguage || "").trim();
+
+  if (mode === "bilingual" && nativeLanguage) {
+    return `
+Language mode: bilingual
+- Write mainly in English.
+- Blend in a small, natural amount of ${nativeLanguage}.
+- Do not overdo it.
+- Keep the letter readable for someone who understands mostly English.
+- Use the second language for emotional emphasis, closings, or selected lines only.
+- Do not make it feel like a stiff translation exercise.
+`;
+  }
+
+  if (mode === "native" && nativeLanguage) {
+    return `
+Language mode: native
+- Write the letter primarily in ${nativeLanguage}.
+- Keep it emotionally natural and culturally believable.
+- Avoid literal, awkward, textbook-style phrasing.
+- If needed, preserve names and certain relationship words naturally.
+`;
+  }
+
+  return `
+Language mode: english
+- Write naturally in English.
+`;
+}
+
+function getEffectiveLength(input: any) {
+  const requested = input.length || "medium";
+  const tier = input.qualityTier === "premium" ? "premium" : "standard";
+
+  if (tier === "premium") {
+    if (requested === "short") return { min: 180, max: 260 };
+    if (requested === "medium") return { min: 320, max: 460 };
+    return { min: 520, max: 760 };
+  }
+
+  return lengthRanges[requested] ?? lengthRanges.medium;
+}
+
 function buildClosingRule(occasion: string) {
   if (occasion === "mothers-day") {
     return `Use a fitting Mother's Day closing naturally. Examples include: "Happy Mother's Day 💐", "With love always", "With all my love", "Forever grateful". Only use relationship-specific closings like "Your proud child" if they clearly fit the sender role.`;
@@ -327,7 +405,7 @@ function buildUserPrompt(input: any) {
 }
 
 function styleGuide(input: any) {
-  const { min, max } = lengthRanges[input.length] ?? lengthRanges.medium;
+  const { min, max } = getEffectiveLength(input);
 
   const titlePreviewRules =
     input.occasion === "mothers-day"
@@ -337,12 +415,16 @@ Title and preview rules:
 - Make both feel natural, specific, and emotionally believable.
 - Avoid generic greeting-card phrasing.
 - Do not use placeholder language.
+- Make the title feel like something a real person would want to send.
+- Make the preview feel inviting and emotionally grounded.
 `;
 
   return `
 ${buildOccasionRules(input.occasion, input.recipientType)}
 ${titlePreviewRules}
 ${buildHumanToneRules(input)}
+${buildQualityTierRules(input)}
+${buildLanguageRules(input)}
 
 Constraints:
 - Tone: ${input.tone || "natural"}
@@ -374,7 +456,7 @@ async function callGroq(input: any, fix?: string) {
 
 export async function generateLetterWithGroq(input: any) {
   const out1 = await callGroq(input);
-  const { min, max } = lengthRanges[input.length] ?? lengthRanges.medium;
+  const { min, max } = getEffectiveLength(input);
   const wc = wordCount(out1.letter);
 
   const recipientMode =
@@ -389,16 +471,35 @@ export async function generateLetterWithGroq(input: any) {
       `${out1.title}\n${out1.preview}\n${out1.letter}\n${out1.ps || ""}`
     );
 
-  if (wc >= min && wc <= max && !invalidMotherAssumption) return out1;
+  const needsLengthFix = wc < min || wc > max;
 
-  const extraFix = invalidMotherAssumption
-    ? `Rewrite so it does NOT assume the recipient is already a mother.
-  Do NOT use "Happy Mother's Day" directly.
-  Do NOT frame the message as celebrating her as a mother.
-  Do NOT mention children or pregnancy.
-  Keep it emotionally rich, natural, and suitable for Mother's Day in a soft, indirect way.
-  JSON only.`
-    : `Rewrite letter to ${min}-${max} words. Keep tone and details. JSON only.`;
-    
+  const needsPremiumPolish =
+    input.qualityTier === "premium" &&
+    /your love, strength, grace, and beauty|truly special gift|constant source of comfort, strength, and joy|filled with so much gratitude/i.test(
+      `${out1.title}\n${out1.preview}\n${out1.letter}\n${out1.ps || ""}`
+    );
+
+  if (!needsLengthFix && !invalidMotherAssumption && !needsPremiumPolish) {
+    return out1;
+  }
+
+  let extraFix = `Rewrite letter to ${min}-${max} words. Keep tone and details. JSON only.`;
+
+  if (invalidMotherAssumption) {
+    extraFix = `Rewrite so it does NOT assume the recipient is already a mother.
+Do NOT use "Happy Mother's Day" directly.
+Do NOT frame the message as celebrating her as a mother.
+Do NOT mention children or pregnancy.
+Keep it emotionally rich, natural, and suitable for Mother's Day in a soft, indirect way.
+JSON only.`;
+  } else if (needsPremiumPolish) {
+    extraFix = `Rewrite to feel more human and less like a greeting card.
+Reduce clichés and generic praise.
+Vary sentence rhythm more.
+Make the writing feel more intimate, grounded, and natural.
+Keep the same meaning and emotional tone.
+Return JSON only.`;
+  }
+
   return await callGroq(input, extraFix);
 }
