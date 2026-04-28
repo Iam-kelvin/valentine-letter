@@ -6,6 +6,7 @@ import Link from "next/link";
 import ShareButton from "@/components/ShareButton";
 import PaperLetterReveal from "@/components/PaperLetterReveal";
 import UnlockBox from "./unlock-box";
+import { getOccasionPageBackground } from "@/lib/occasion-themes";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -74,13 +75,12 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
     <main
       style={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(60% 60% at 50% 0%, rgba(255, 0, 128, 0.12), transparent 60%), #000",
+        background: getOccasionPageBackground(row.occasion),
         color: "#fff",
-        padding: "32px 18px",
+        padding: "28px 16px",
       }}
     >
-      <div style={{ maxWidth: 980, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1180, margin: "0 auto" }}>
         <Link href="/" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "none" }}>
           ← Home
         </Link>
@@ -95,7 +95,7 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
             }}
           >
             <div style={{ flex: 1 }}>
-              <h1 style={{ fontSize: 72, margin: 0, letterSpacing: -1 }}>
+              <h1 style={{ fontSize: "clamp(44px, 8vw, 92px)", margin: 0, letterSpacing: -1 }}>
                 {row.title}
               </h1>
 

@@ -59,6 +59,20 @@ export async function getLettersForUser(userId: string) {
   return rows;
 }
 
+export async function getRecentLettersForUser(userId: string, limit = 3) {
+  await ensureLettersUserIdColumn();
+
+  const { rows } = await sql`
+    SELECT slug, occasion, title, preview, sender_name, recipient_name, created_at, expires_at
+    FROM letters
+    WHERE user_id = ${userId}
+    ORDER BY created_at DESC
+    LIMIT ${limit}
+  `;
+
+  return rows;
+}
+
 let userIdColumnReady = false;
 
 async function ensureLettersUserIdColumn() {

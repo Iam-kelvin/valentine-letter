@@ -39,7 +39,7 @@ export default function RootLayout({
         style={{
           minHeight: "100vh",
           background:
-            "radial-gradient(60% 60% at 50% 0%, rgba(255, 0, 128, 0.12), transparent 60%), #000",
+            "radial-gradient(60% 60% at 50% 0%, rgba(255, 0, 128, 0.12), transparent 60%), linear-gradient(180deg, #13040a, #060304)",
           color: "#fff",
         }}
       >

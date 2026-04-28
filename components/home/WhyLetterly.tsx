@@ -15,10 +15,10 @@ const reasons = [
 
 export function WhyLetterly() {
   return (
-    <section className="px-6 py-20 sm:px-8 lg:px-10">
+    <section className="px-5 py-14 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-3xl font-semibold text-white sm:text-4xl">Why Letterly</h2>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
           {reasons.map((reason) => (
             <article
               key={reason.title}

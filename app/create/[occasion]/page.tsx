@@ -260,6 +260,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getOccasion } from "@/lib/occasions";
+import { getOccasionPageBackground } from "@/lib/occasion-themes";
 
 type Length = "short" | "medium" | "long";
 type Privacy = "low" | "medium" | "high";
@@ -444,13 +445,14 @@ export default function OccasionCreatePage() {
 
   return (
     <main
-        style={{
-        maxWidth: 1140,
-        margin: "0 auto",
-        padding: "20px 20px 28px",
+      style={{
+        minHeight: "100vh",
+        background: getOccasionPageBackground(occasion.key),
         color: "inherit",
-    }}
+        padding: "20px 16px 28px",
+      }}
     >
+      <div style={{ maxWidth: 1140, margin: "0 auto" }}>
       <Link
         href="/"
         style={{
@@ -484,7 +486,7 @@ export default function OccasionCreatePage() {
             padding: 16,
           }}
         >
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <div style={twoColumnGridStyle}>
             <div>
               <label style={{ display: "block", marginBottom: 8, fontSize: 16 }}>
                 Your name (sender)
@@ -516,7 +518,7 @@ export default function OccasionCreatePage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr",
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
                 gap: 10,
                 marginTop: 12,
               }}
@@ -570,7 +572,7 @@ export default function OccasionCreatePage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr",
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
                 gap: 10,
                 marginTop: 12,
               }}
@@ -724,7 +726,7 @@ export default function OccasionCreatePage() {
             padding: 22,
           }}
         >
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={twoColumnGridStyle}>
             <div>
               <label style={labelStyle}>Password lock (optional)</label>
               <input
@@ -776,6 +778,7 @@ export default function OccasionCreatePage() {
           <p style={{ color: "#ff7b93", marginTop: -8 }}>{err}</p>
         ) : null}
       </form>
+      </div>
     </main>
   );
 }
@@ -851,6 +854,12 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   marginBottom: 6,
   fontSize: 14,
+};
+
+const twoColumnGridStyle: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: 10,
 };
 
 const inputStyle: React.CSSProperties = {

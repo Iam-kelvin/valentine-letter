@@ -59,11 +59,25 @@ const occasions = [
 
 export function OccasionCards() {
   return (
-    <section id="occasions" className="px-6 py-20 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-6xl">
-        <h2 className="max-w-2xl text-3xl font-semibold leading-tight text-white sm:text-4xl">
-          Made for every kind of message
-        </h2>
+    <section id="occasions" className="relative px-5 py-20 sm:px-8 lg:px-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_80%_0%,rgba(244,63,94,0.14),transparent_32%)]" />
+      <div className="relative mx-auto max-w-6xl">
+        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-rose-200/70">
+              Start here
+            </p>
+            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight text-white sm:text-4xl">
+              Made for every kind of message
+            </h2>
+          </div>
+          <Link
+            href="/create"
+            className="inline-flex rounded-2xl border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-bold text-white/82 transition hover:border-white/25 hover:bg-white/[0.08]"
+          >
+            View all occasions →
+          </Link>
+        </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {occasions.map((occasion) => (

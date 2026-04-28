@@ -60,6 +60,19 @@ export async function getAnonymousMessagesForUser(userId: string) {
   return rows;
 }
 
+export async function getAnonymousMessageCountForUser(userId: string) {
+  const rows = await sql`
+    SELECT COUNT(*)::int AS count
+    FROM anonymous_messages m
+    JOIN anonymous_profiles p ON p.id = m.profile_id
+    WHERE p.user_id = ${userId}
+      AND m.is_deleted = FALSE
+      AND m.is_archived = FALSE;
+  `;
+
+  return rows[0]?.count ?? 0;
+}
+
 export async function archiveAnonymousMessage(input: {
   messageId: number;
   userId: string;
