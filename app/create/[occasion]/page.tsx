@@ -282,6 +282,15 @@ function getSuggestions(occasionKey: string) {
         cta: 'e.g., "Happy Mother’s Day, Mom. I love you always."',
       };
 
+    case "fathers-day":
+      return {
+        memories: "- Times you showed up when it mattered\n- Lessons you taught me without making a big speech\n- Quiet sacrifices I understand more now",
+        insideJokes: "- The phrase you always say\n- Family jokes only we understand\n- Your classic dad advice",
+        qualities: "- Steady\n- Protective\n- Hardworking\n- Dependable",
+        futurePlans: "- Making you proud\n- Spending more time together\n- Carrying what you taught me forward",
+        cta: 'e.g., "Happy Father\'s Day. I appreciate you more than I say."',
+      };
+
     case "womens-day":
       return {
         memories: "- Moments where you inspired me\n- Times you showed strength\n- Ways you’ve impacted my life",
@@ -316,6 +325,15 @@ function getSuggestions(occasionKey: string) {
         qualities: "- Sweet\n- Genuine\n- Caring\n- Memorable",
         futurePlans: "- More good moments ahead\n- Staying close\n- More memories together",
         cta: 'e.g., "I just wanted you to know you mean a lot to me."',
+      };
+
+    case "cheeky":
+      return {
+        memories: "- The first time I noticed you differently\n- That look you gave me\n- The conversation I keep replaying",
+        insideJokes: "- The teasing thing we keep doing\n- That nickname you pretend to hate\n- The moment we both knew what was happening",
+        qualities: "- Confident\n- Funny\n- Fine\n- Hard to ignore",
+        futurePlans: "- Seeing where this goes\n- One honest conversation\n- More of this tension, but less pretending",
+        cta: 'e.g., "So... are we going to keep pretending or say it properly?"',
       };
 
     case "love":

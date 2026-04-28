@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
-import { SignInButton, UserButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import { getAnonymousProfileByUserId } from "@/lib/anonymous-db";
 
 export default async function SiteNav() {
@@ -8,74 +8,47 @@ export default async function SiteNav() {
   const profile = userId ? await getAnonymousProfileByUserId(userId) : null;
 
   return (
-    <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 50,
-        backdropFilter: "blur(12px)",
-        background: "rgba(10,10,14,0.72)",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1100,
-          margin: "0 auto",
-          padding: "14px 20px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-        }}
-      >
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-black/55 text-white backdrop-blur-xl">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
         <Link
           href="/"
-          style={{
-            color: "#fff",
-            textDecoration: "none",
-            fontWeight: 800,
-            fontSize: 20,
-            letterSpacing: "-0.02em",
-          }}
+          className="text-lg font-extrabold tracking-normal text-white no-underline"
         >
-          Send With Love
+          Letterly
         </Link>
 
-        <nav
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 14,
-            flexWrap: "wrap",
-          }}
-        >
-          <Link href="/" style={navLinkStyle}>
-            Home
-          </Link>
-
-          <Link href="/anonymous" style={navLinkStyle}>
-            Anonymous
+        <nav className="flex flex-wrap items-center justify-end gap-3">
+          <Link href="/create" className={navLinkClass}>
+            Write
           </Link>
 
           {userId ? (
             <>
-              <Link href="/dashboard/anonymous" style={navLinkStyle}>
-                Dashboard
+              <Link href="/dashboard/letters" className={navLinkClass}>
+                My letters
               </Link>
-
+              <Link href="/dashboard/anonymous" className={navLinkClass}>
+                Inbox
+              </Link>
               {profile ? (
-                <Link href={`/u/${profile.username}`} style={navLinkStyle}>
+                <Link href={`/u/${profile.username}`} className={navLinkClass}>
                   My Link
                 </Link>
               ) : null}
-
               <UserButton />
             </>
           ) : (
-            <SignInButton mode="redirect" forceRedirectUrl="/dashboard/anonymous">
-              <button style={navButtonStyle}>Sign in</button>
-            </SignInButton>
+            <>
+              <Link href="/anonymous" className={navLinkClass}>
+                Anonymous
+              </Link>
+              <SignInButton mode="redirect" forceRedirectUrl="/create">
+                <button className={navGhostButtonClass}>Sign in</button>
+              </SignInButton>
+              <SignUpButton mode="redirect" forceRedirectUrl="/create">
+                <button className={navButtonClass}>Create account</button>
+              </SignUpButton>
+            </>
           )}
         </nav>
       </div>
@@ -83,19 +56,11 @@ export default async function SiteNav() {
   );
 }
 
-const navLinkStyle: React.CSSProperties = {
-  color: "rgba(255,255,255,0.84)",
-  textDecoration: "none",
-  fontSize: 15,
-  fontWeight: 500,
-};
+const navLinkClass =
+  "text-sm font-semibold text-white/76 no-underline transition hover:text-white";
 
-const navButtonStyle: React.CSSProperties = {
-  border: "1px solid rgba(255,255,255,0.14)",
-  background: "rgba(255,255,255,0.06)",
-  color: "#fff",
-  padding: "10px 14px",
-  borderRadius: 999,
-  cursor: "pointer",
-  fontWeight: 600,
-};
+const navGhostButtonClass =
+  "cursor-pointer rounded-full border border-white/14 bg-white/[0.04] px-4 py-2 text-sm font-bold text-white transition hover:bg-white/[0.08]";
+
+const navButtonClass =
+  "cursor-pointer rounded-full bg-white px-4 py-2 text-sm font-bold text-zinc-950 transition hover:bg-rose-50";

@@ -1,67 +1,20 @@
-import Link from "next/link";
-import { OCCASIONS } from "@/lib/occasions";
-
-const cardStyle: React.CSSProperties = {
-  textDecoration: "none",
-  color: "inherit",
-  borderRadius: 22,
-  padding: 20,
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.05)",
-  boxShadow: "0 18px 50px rgba(0,0,0,0.18)",
-  display: "block",
-};
+import { FinalCta } from "@/components/home/FinalCta";
+import { HomeHero } from "@/components/home/HomeHero";
+import { OccasionCards } from "@/components/home/OccasionCards";
+import { SampleLetterShowcase } from "@/components/home/SampleLetterShowcase";
+import { WhyLetterly } from "@/components/home/WhyLetterly";
 
 export default function HomePage() {
-  const items = Object.values(OCCASIONS);
-
   return (
-    <main style={{ maxWidth: 1080, margin: "0 auto", padding: 28, lineHeight: 1.6 }}>
-      <div style={{ textAlign: "center", marginBottom: 28 }}>
-        <div
-          style={{
-            display: "inline-block",
-            padding: "6px 12px",
-            border: "1px solid rgba(255,255,255,0.18)",
-            borderRadius: 999,
-            marginBottom: 14,
-            opacity: 0.9,
-          }}
-        >
-          💌 Occasion Letter Generator
-        </div>
+    <main className="relative isolate overflow-hidden bg-[#050305] text-white">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(244,63,94,0.20),transparent_34%),radial-gradient(circle_at_12%_22%,rgba(190,18,60,0.13),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0)_28%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-px bg-white/20" />
 
-        <h1 style={{ fontSize: 48, margin: "0 0 10px" }}>Say it like you mean it.</h1>
-
-        <p style={{ maxWidth: 700, margin: "0 auto", opacity: 0.82 }}>
-          Create beautiful, private digital letters for love, Mother’s Day, birthdays,
-          appreciation, and more.
-        </p>
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          gap: 16,
-        }}
-      >
-        {items.map((item) => (
-          <Link key={item.key} href={item.path} style={cardStyle}>
-            <div style={{ fontSize: 28, marginBottom: 12 }}>{item.emoji}</div>
-            <h2 style={{ margin: "0 0 8px", fontSize: 24 }}>{item.label}</h2>
-            <p style={{ margin: 0, opacity: 0.78 }}>{item.subtitle}</p>
-          </Link>
-        ))}
-
-        <Link href="/anonymous" style={cardStyle}>
-          <div style={{ fontSize: 28, marginBottom: 12 }}>👀</div>
-          <h2 style={{ margin: "0 0 8px", fontSize: 24 }}>Anonymous Messages</h2>
-          <p style={{ margin: 0, opacity: 0.78 }}>
-            Create your own private link and let people send you anonymous messages.
-          </p>
-        </Link>
-      </div>
+      <HomeHero />
+      <SampleLetterShowcase />
+      <OccasionCards />
+      <WhyLetterly />
+      <FinalCta />
     </main>
   );
 }

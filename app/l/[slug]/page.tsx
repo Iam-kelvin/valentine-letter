@@ -4,7 +4,6 @@ import { getLetter } from "@/lib/db";
 import { cookieNameForSlug, verifyAccessToken } from "@/lib/letter-auth";
 import Link from "next/link";
 import ShareButton from "@/components/ShareButton";
-import EnvelopeReveal from "@/components/EnvelopeReveal";
 import PaperLetterReveal from "@/components/PaperLetterReveal";
 import UnlockBox from "./unlock-box";
 
@@ -64,12 +63,6 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
     );
   }
 
-  const isPaperOccasion =
-    row.occasion === "mothers-day" ||
-    row.occasion === "womens-day" ||
-    row.occasion === "appreciation" ||
-    row.occasion === "just-because";
-
   const senderName = (row as any).sender_name ?? (row as any).senderName ?? null;
   const senderRole =
     (row as any).sender_role ??
@@ -127,8 +120,8 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
           }}
         />
 
-          {isPaperOccasion ? (
           <PaperLetterReveal
+            occasion={row.occasion}
             title={row.title}
             recipientLine={
               (row as any).recipient_name
@@ -147,18 +140,6 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
             ctaBody="Now go make one for your person in seconds."
             ctaButtonText="Create my letter 💌"
           />
-        ) : (
-          <EnvelopeReveal
-            title={row.title}
-            preview={row.preview}
-            letter={row.letter}
-            ps={row.ps}
-            ctaHref={`/create/${row.occasion || "love"}`}
-            ctaTitle="Aww 😌 Want one like this?"
-            ctaBody="Now go make one for your person in seconds."
-            ctaButtonText="Create my letter 💌"
-          />
-        )}
       </div>
     </main>
   );

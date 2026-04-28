@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import LetterCelebration from "./LetterCelebration";
 
 type Props = {
+  occasion?: string | null;
   title: string;
   recipientLine?: string | null;
   preview?: string | null;
@@ -18,13 +19,102 @@ type Props = {
   ctaButtonText?: string;
 };
 
+type OccasionTheme = {
+  seal: string;
+  cornerOne: string;
+  cornerTwo: string;
+  symbols: string[];
+  centerSymbol: string;
+  glow: string;
+};
+
+const occasionThemes: Record<string, OccasionTheme> = {
+  love: {
+    seal: "💘",
+    cornerOne: "💞",
+    cornerTwo: "❤️",
+    symbols: ["💘", "💞", "💗", "🌹", "✨"],
+    centerSymbol: "💘",
+    glow: "rgba(255,92,146,0.56)",
+  },
+  "mothers-day": {
+    seal: "💐",
+    cornerOne: "🌸",
+    cornerTwo: "🌷",
+    symbols: ["💐", "🌸", "🌷", "✨", "💗"],
+    centerSymbol: "💐",
+    glow: "rgba(255,205,225,0.58)",
+  },
+  "womens-day": {
+    seal: "🌷",
+    cornerOne: "🌷",
+    cornerTwo: "✨",
+    symbols: ["🌷", "🌸", "⭐", "✨", "💫"],
+    centerSymbol: "🌷",
+    glow: "rgba(255,205,235,0.54)",
+  },
+  birthday: {
+    seal: "🎈",
+    cornerOne: "🎂",
+    cornerTwo: "🎉",
+    symbols: ["🎈", "🎈", "🎊", "🎉", "✨"],
+    centerSymbol: "🎈",
+    glow: "rgba(255,226,150,0.58)",
+  },
+  "fathers-day": {
+    seal: "⭐",
+    cornerOne: "⭐",
+    cornerTwo: "🏆",
+    symbols: ["⭐", "🏆", "✨", "💫", "🤎"],
+    centerSymbol: "⭐",
+    glow: "rgba(255,221,150,0.52)",
+  },
+  appreciation: {
+    seal: "🙏",
+    cornerOne: "✨",
+    cornerTwo: "💛",
+    symbols: ["✨", "💛", "⭐", "🙏", "💫"],
+    centerSymbol: "✨",
+    glow: "rgba(255,232,160,0.54)",
+  },
+  "just-because": {
+    seal: "💌",
+    cornerOne: "💌",
+    cornerTwo: "✨",
+    symbols: ["💌", "✨", "💗", "🌙", "⭐"],
+    centerSymbol: "💌",
+    glow: "rgba(235,210,255,0.52)",
+  },
+  cheeky: {
+    seal: "😏",
+    cornerOne: "✨",
+    cornerTwo: "🔥",
+    symbols: ["😏", "✨", "🔥", "💫", "💋"],
+    centerSymbol: "😏",
+    glow: "rgba(255,154,205,0.52)",
+  },
+};
+
+function getOccasionTheme(occasion?: string | null) {
+  return occasionThemes[occasion || ""] ?? occasionThemes.love;
+}
+
+function makeTypingParticles(symbols: string[]) {
+  return Array.from({ length: 18 }, (_, index) => ({
+    symbol: symbols[index % symbols.length],
+    left: `${4 + ((index * 11.7) % 92)}%`,
+    delay: `${(index % 9) * 0.75}s`,
+    duration: `${8 + (index % 5) * 0.85}s`,
+    size: 18 + (index % 4) * 5,
+  }));
+}
+
 function buildSignature(senderRole?: string | null, senderName?: string | null) {
   const cleanRole = senderRole?.trim();
   const cleanName = senderName?.trim();
 
   if (cleanRole && cleanName) {
     const lower = cleanRole.toLowerCase();
-
     const mapped =
       lower === "son"
         ? "Your son"
@@ -50,15 +140,16 @@ function buildSignature(senderRole?: string | null, senderName?: string | null) 
         ? "Your niece"
         : `Your ${cleanRole}`;
 
-    return `— ${mapped}, ${cleanName}`;
+    return `- ${mapped}, ${cleanName}`;
   }
 
-  if (cleanName) return `— With love, ${cleanName}`;
-  if (cleanRole) return `— Your ${cleanRole}`;
-  return "— With love";
+  if (cleanName) return `- With love, ${cleanName}`;
+  if (cleanRole) return `- Your ${cleanRole}`;
+  return "- With love";
 }
 
 export default function PaperLetterReveal({
+  occasion,
   title,
   recipientLine,
   preview,
@@ -66,19 +157,24 @@ export default function PaperLetterReveal({
   ps,
   senderName,
   senderRole,
-  ctaHref = "/create/mothers-day",
+  ctaHref = "/create",
   ctaTitle = "Aww 😌 Want one like this?",
   ctaBody = "Now go make one for your person in seconds.",
   ctaButtonText = "Create my letter 💌",
 }: Props) {
-    const [opened, setOpened] = useState(false);
-    const [typedText, setTypedText] = useState("");
-    const [typedPs, setTypedPs] = useState("");
-    const [showSignature, setShowSignature] = useState(false);
-    const [showCelebration, setShowCelebration] = useState(false);
-    const [showFinishGlow, setShowFinishGlow] = useState(false);
-    const [isTypingActive, setIsTypingActive] = useState(false);
+  const [opened, setOpened] = useState(false);
+  const [typedText, setTypedText] = useState("");
+  const [typedPs, setTypedPs] = useState("");
+  const [showSignature, setShowSignature] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [showFinishGlow, setShowFinishGlow] = useState(false);
+  const [isTypingActive, setIsTypingActive] = useState(false);
 
+  const theme = getOccasionTheme(occasion);
+  const typingParticles = useMemo(
+    () => makeTypingParticles(theme.symbols),
+    [theme.symbols]
+  );
   const signature = useMemo(
     () => buildSignature(senderRole, senderName),
     [senderRole, senderName]
@@ -90,26 +186,82 @@ export default function PaperLetterReveal({
 
   useEffect(() => {
     if (!opened) return;
-        setIsTypingActive(true);
+
+    setTypedText("");
+    setTypedPs("");
+    setShowSignature(false);
+    setShowCelebration(false);
+    setShowFinishGlow(false);
+    setIsTypingActive(true);
 
     let cancelled = false;
     let mainTimeout: number | null = null;
     let psTimeout: number | null = null;
     let finishTimeout: number | null = null;
     let glowTimeout: number | null = null;
+    let celebrationTimeout: number | null = null;
 
-    let i = 0;
     const fullText = letter || "";
     const charDelay = 42;
+    let i = 0;
 
-    function next() {
+    const finish = () => {
+      finishTimeout = window.setTimeout(() => {
+        if (cancelled) return;
+
+        setIsTypingActive(false);
+        setShowSignature(true);
+        setShowCelebration(true);
+        setShowFinishGlow(true);
+        navigator.vibrate?.(120);
+
+        glowTimeout = window.setTimeout(() => setShowFinishGlow(false), 2200);
+        celebrationTimeout = window.setTimeout(() => {
+          if (!cancelled) setShowCelebration(false);
+        }, 3600);
+      }, 220);
+    };
+
+    const typePs = () => {
+      if (!ps?.trim()) {
+        finish();
+        return;
+      }
+
+      const psText = `PS: ${ps.trim()}`;
+      let j = 0;
+
+      const nextPs = () => {
+        if (cancelled) return;
+
+        if (j < psText.length) {
+          setTypedPs(psText.slice(0, j + 1));
+          const ch = psText[j];
+          j += 1;
+          let delay = charDelay;
+
+          if (ch === "." || ch === "!" || ch === "?") delay += 130;
+          else if (ch === "," || ch === ";" || ch === ":") delay += 80;
+          else if (ch === "\n") delay += 110;
+          else if (ch === " ") delay -= 8;
+
+          psTimeout = window.setTimeout(nextPs, Math.max(delay, 22));
+          return;
+        }
+
+        finish();
+      };
+
+      nextPs();
+    };
+
+    const next = () => {
       if (cancelled) return;
 
       if (i < fullText.length) {
         setTypedText(fullText.slice(0, i + 1));
         const ch = fullText[i];
         i += 1;
-
         let delay = charDelay;
 
         if (ch === "." || ch === "!" || ch === "?") delay += 105;
@@ -121,69 +273,8 @@ export default function PaperLetterReveal({
         return;
       }
 
-      if (ps?.trim()) {
-        let j = 0;
-        const psText = `PS: ${ps.trim()}`;
-
-        function nextPs() {
-          if (cancelled) return;
-
-          if (j < psText.length) {
-            setTypedPs(psText.slice(0, j + 1));
-            const ch2 = psText[j];
-            j += 1;
-
-            let delay = charDelay;
-
-            if (ch2 === "." || ch2 === "!" || ch2 === "?") delay += 130;
-            else if (ch2 === "," || ch2 === ";" || ch2 === ":") delay += 80;
-            else if (ch2 === "\n") delay += 110;
-            else if (ch2 === " ") delay -= 8;
-
-            psTimeout = window.setTimeout(nextPs, Math.max(delay, 22));
-          } else {
-            finishTimeout = window.setTimeout(() => {
-              if (!cancelled) {
-                setIsTypingActive(false);
-                setShowSignature(true);
-                setShowCelebration(true);
-                setShowFinishGlow(true);
-                navigator.vibrate?.(120);
-
-                glowTimeout = window.setTimeout(() => {
-                  setShowFinishGlow(false);
-                }, 2200);
-
-                window.setTimeout(() => {
-                  if (!cancelled) setShowCelebration(false);
-                }, 3600);
-              }
-            }, 220);
-          }
-        }
-
-        nextPs();
-        return;
-      }
-
-      finishTimeout = window.setTimeout(() => {
-        if (!cancelled) {
-          setIsTypingActive(false);
-          setShowSignature(true);
-          setShowCelebration(true);
-          setShowFinishGlow(true);
-          navigator.vibrate?.(120);
-
-          glowTimeout = window.setTimeout(() => {
-            setShowFinishGlow(false);
-          }, 2200);
-
-          window.setTimeout(() => {
-            if (!cancelled) setShowCelebration(false);
-          }, 3600);
-        }
-      }, 220);
-    }
+      typePs();
+    };
 
     next();
 
@@ -193,10 +284,11 @@ export default function PaperLetterReveal({
       if (psTimeout) window.clearTimeout(psTimeout);
       if (finishTimeout) window.clearTimeout(finishTimeout);
       if (glowTimeout) window.clearTimeout(glowTimeout);
+      if (celebrationTimeout) window.clearTimeout(celebrationTimeout);
     };
   }, [opened, letter, ps]);
 
-    useEffect(() => {
+  useEffect(() => {
     if (!opened || !isTypingActive) return;
 
     let stoppedByUser = false;
@@ -204,9 +296,7 @@ export default function PaperLetterReveal({
 
     const stopFollowingTemporarily = () => {
       stoppedByUser = true;
-
       if (stopTimer) window.clearTimeout(stopTimer);
-
       stopTimer = window.setTimeout(() => {
         stoppedByUser = false;
       }, 900);
@@ -235,9 +325,7 @@ export default function PaperLetterReveal({
     const followTyping = (now: number) => {
       const anchor = typingAnchorRef.current;
 
-      if (!anchor || !isTypingActive) {
-        return;
-      }
+      if (!anchor || !isTypingActive) return;
 
       if (now - lastFollowTimeRef.current < 120) {
         followRafRef.current = requestAnimationFrame(followTyping);
@@ -248,17 +336,12 @@ export default function PaperLetterReveal({
 
       if (!stoppedByUser) {
         const rect = anchor.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-
-        const desiredLineY = viewportHeight * 0.78;
+        const desiredLineY = window.innerHeight * 0.78;
         const delta = rect.bottom - desiredLineY;
 
         if (delta > 26) {
-          const nextTop =
-            window.scrollY + Math.min(delta * 0.28, 20);
-
           window.scrollTo({
-            top: nextTop,
+            top: window.scrollY + Math.min(delta * 0.28, 20),
             behavior: "auto",
           });
         }
@@ -270,14 +353,8 @@ export default function PaperLetterReveal({
     followRafRef.current = requestAnimationFrame(followTyping);
 
     return () => {
-      if (followRafRef.current) {
-        cancelAnimationFrame(followRafRef.current);
-      }
-
-      if (stopTimer) {
-        window.clearTimeout(stopTimer);
-      }
-
+      if (followRafRef.current) cancelAnimationFrame(followRafRef.current);
+      if (stopTimer) window.clearTimeout(stopTimer);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("keydown", onKeyDown);
@@ -312,6 +389,20 @@ export default function PaperLetterReveal({
             opacity: 0;
           }
         }
+
+        @keyframes occasionFall {
+          0% {
+            opacity: 0;
+            transform: translate3d(0, -34px, 0) rotate(0deg) scale(0.78);
+          }
+          12% {
+            opacity: 0.34;
+          }
+          100% {
+            opacity: 0;
+            transform: translate3d(0, 118vh, 0) rotate(26deg) scale(1.08);
+          }
+        }
       `}</style>
 
       {showFinishGlow ? (
@@ -322,8 +413,7 @@ export default function PaperLetterReveal({
             pointerEvents: "none",
             zIndex: 30,
             animation: "finishGlowFade 2.2s ease-out forwards",
-            background:
-              "radial-gradient(circle at center, rgba(255,244,229,0.55) 0%, rgba(255,244,229,0.18) 35%, rgba(255,244,229,0) 72%)",
+            background: `radial-gradient(circle at center, ${theme.glow} 0%, rgba(255,244,229,0.18) 35%, rgba(255,244,229,0) 72%)`,
           }}
         />
       ) : null}
@@ -337,7 +427,7 @@ export default function PaperLetterReveal({
             if (e.key === "Enter" || e.key === " ") setOpened(true);
           }}
           style={{
-            maxWidth: 420,
+            maxWidth: 560,
             margin: "28px auto 0",
             cursor: "pointer",
             userSelect: "none",
@@ -346,7 +436,7 @@ export default function PaperLetterReveal({
           <div
             style={{
               position: "relative",
-              height: 280,
+              height: 360,
               borderRadius: 28,
               background:
                 "linear-gradient(180deg, rgba(70,20,35,0.95), rgba(22,14,16,0.98))",
@@ -389,10 +479,10 @@ export default function PaperLetterReveal({
                 display: "grid",
                 placeItems: "center",
                 boxShadow: "0 10px 30px rgba(255,91,151,0.35)",
-                fontSize: 28,
+                fontSize: 30,
               }}
             >
-              💐
+              {theme.seal}
             </div>
 
             <div
@@ -426,7 +516,41 @@ export default function PaperLetterReveal({
             overflow: "hidden",
           }}
         >
-          <LetterCelebration show={showCelebration} />
+          {isTypingActive ? (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                pointerEvents: "none",
+                overflow: "hidden",
+                zIndex: 0,
+              }}
+            >
+              {typingParticles.map((particle, index) => (
+                <span
+                  key={`${particle.symbol}-${index}`}
+                  style={{
+                    position: "absolute",
+                    top: -42,
+                    left: particle.left,
+                    fontSize: particle.size,
+                    opacity: 0,
+                    animation: `occasionFall ${particle.duration} linear ${particle.delay} infinite`,
+                    filter: "drop-shadow(0 8px 14px rgba(0,0,0,0.12))",
+                    willChange: "transform, opacity",
+                  }}
+                >
+                  {particle.symbol}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          <LetterCelebration
+            show={showCelebration}
+            symbols={theme.symbols}
+            centerSymbol={theme.centerSymbol}
+          />
 
           <div
             style={{
@@ -437,7 +561,7 @@ export default function PaperLetterReveal({
               opacity: 0.55,
             }}
           >
-            🌸
+            {theme.cornerOne}
           </div>
 
           <div
@@ -449,7 +573,7 @@ export default function PaperLetterReveal({
               opacity: 0.55,
             }}
           >
-            💗
+            {theme.cornerTwo}
           </div>
 
           <div
@@ -464,15 +588,8 @@ export default function PaperLetterReveal({
             }}
           />
 
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <div
-              style={{
-                marginBottom: 12,
-                fontSize: 18,
-                opacity: 0.8,
-                fontStyle: "italic",
-              }}
-            >
+          <div style={{ position: "relative", zIndex: 2 }}>
+            <div style={{ marginBottom: 12, fontSize: 18, opacity: 0.8, fontStyle: "italic" }}>
               {recipientLine?.trim() || "To you:"}
             </div>
 
@@ -488,14 +605,7 @@ export default function PaperLetterReveal({
             </div>
 
             {preview?.trim() ? (
-              <div
-                style={{
-                  marginBottom: 24,
-                  fontSize: 16,
-                  opacity: 0.78,
-                  fontStyle: "italic",
-                }}
-              >
+              <div style={{ marginBottom: 24, fontSize: 16, opacity: 0.78, fontStyle: "italic" }}>
                 {preview}
               </div>
             ) : null}
@@ -511,12 +621,7 @@ export default function PaperLetterReveal({
             >
               {typedText}
               {typedText.length < (letter?.length || 0) ? (
-                <span
-                  style={{
-                    opacity: 0.9,
-                    animation: "caretBlink 1s steps(1) infinite",
-                  }}
-                >
+                <span style={{ opacity: 0.9, animation: "caretBlink 1s steps(1) infinite" }}>
                   |
                 </span>
               ) : null}
@@ -534,12 +639,7 @@ export default function PaperLetterReveal({
               >
                 {typedPs}
                 {typedPs.length < (`PS: ${ps?.trim() || ""}`).length ? (
-                  <span
-                    style={{
-                      opacity: 0.9,
-                      animation: "caretBlink 1s steps(1) infinite",
-                    }}
-                  >
+                  <span style={{ opacity: 0.9, animation: "caretBlink 1s steps(1) infinite" }}>
                     |
                   </span>
                 ) : null}
@@ -549,12 +649,7 @@ export default function PaperLetterReveal({
             <div ref={typingAnchorRef} style={{ height: 2, width: "100%" }} />
 
             {showSignature ? (
-              <div
-                style={{
-                  marginTop: 34,
-                  textAlign: "right",
-                }}
-              >
+              <div style={{ marginTop: 34, textAlign: "right" }}>
                 <div
                   style={{
                     fontSize: 22,
@@ -583,24 +678,10 @@ export default function PaperLetterReveal({
               }}
             >
               <div style={{ flex: 1, minWidth: 240 }}>
-                <div
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 700,
-                    marginBottom: 8,
-                    color: "#5a3d2b",
-                  }}
-                >
+                <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8, color: "#5a3d2b" }}>
                   {ctaTitle}
                 </div>
-
-                <div
-                  style={{
-                    fontSize: 16,
-                    lineHeight: 1.6,
-                    color: "rgba(90, 61, 43, 0.88)",
-                  }}
-                >
+                <div style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(90, 61, 43, 0.88)" }}>
                   {ctaBody}
                 </div>
               </div>

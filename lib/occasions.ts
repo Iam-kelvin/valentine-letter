@@ -1,10 +1,12 @@
 export type OccasionKey =
   | "love"
   | "mothers-day"
+  | "fathers-day"
   | "womens-day"
   | "birthday"
   | "appreciation"
-  | "just-because";
+  | "just-because"
+  | "cheeky";
 
 export const OCCASIONS = {
   love: {
@@ -84,6 +86,36 @@ export const OCCASIONS = {
     ],
   },
 
+  "fathers-day": {
+    key: "fathers-day",
+    label: "Father's Day",
+    emoji: "🧔🏾‍♂️",
+    title: "Create a Father's Day Letter",
+    subtitle: "Write something grounded and grateful for the man who showed up.",
+    buttonText: "Create a Father's Day letter",
+    path: "/create/fathers-day",
+    senderRoles: [
+      "Son",
+      "Daughter",
+      "Child",
+      "Wife / Partner",
+      "Friend",
+      "Family Member",
+      "Other",
+    ],
+    recipientTypes: [
+      "My Father",
+      "My Husband",
+      "Stepfather",
+      "Grandfather",
+      "Father Figure",
+      "Expecting Father",
+      "A Man Who Showed Up",
+      "Other",
+    ],
+    tones: ["Warm", "Grounded", "Appreciative", "Respectful", "Lighthearted"],
+  },
+
   "womens-day": {
   key: "womens-day",
   label: "Women’s Day",
@@ -156,6 +188,19 @@ export const OCCASIONS = {
     senderRoles: ["Friend", "Partner", "Family", "Other"],
     recipientTypes: ["Someone Special", "Friend", "Family", "Other"],
     tones: ["Sweet", "Heartfelt", "Poetic", "Playful"],
+  },
+
+  cheeky: {
+    key: "cheeky",
+    label: "Cheeky",
+    emoji: "😏",
+    title: "Create a Cheeky Letter",
+    subtitle: "Write something playful, bold, flirty, and still tasteful.",
+    buttonText: "Create a cheeky letter",
+    path: "/create/cheeky",
+    senderRoles: ["Crush", "Partner", "Situationship", "Friend", "Secret Admirer", "Other"],
+    recipientTypes: ["Crush", "Partner", "Someone I'm Flirting With", "Someone Special", "Other"],
+    tones: ["Playful", "Bold", "Flirty", "Teasing", "Spicy PG-13"],
   },
 } as const;
 

@@ -4,9 +4,9 @@ import React from "react";
 
 type Props = {
   show: boolean;
+  symbols?: string[];
+  centerSymbol?: string;
 };
-
-const SYMBOLS = ["💖", "✨", "💐", "💕", "🌸", "💫", "💗", "🌷", "💞", "⭐"];
 
 type Particle = {
   symbol: string;
@@ -16,49 +16,60 @@ type Particle = {
   duration: string;
 };
 
+const DEFAULT_SYMBOLS = ["💖", "✨", "💐", "💕", "🌸", "💫", "💗", "🌷", "💞", "⭐"];
+
 function makeBottomWave(
   count: number,
   startDelay: number,
-  durationBase: number
+  durationBase: number,
+  symbols: string[]
 ): Particle[] {
   return Array.from({ length: count }, (_, i) => ({
-    symbol: SYMBOLS[i % SYMBOLS.length],
-    left: `${2 + ((i * 3.15) % 96)}%`,
-    delay: `${startDelay + (i % 14) * 0.07}s`,
-    size: 18 + (i % 5) * 4,
-    duration: `${durationBase + (i % 6) * 0.22}s`,
+    symbol: symbols[i % symbols.length],
+    left: `${2 + ((i * 5.3) % 96)}%`,
+    delay: `${startDelay + (i % 10) * 0.08}s`,
+    size: 18 + (i % 4) * 4,
+    duration: `${durationBase + (i % 5) * 0.2}s`,
   }));
 }
 
 function makeTopWave(
   count: number,
   startDelay: number,
-  durationBase: number
+  durationBase: number,
+  symbols: string[]
 ): Particle[] {
   return Array.from({ length: count }, (_, i) => ({
-    symbol: SYMBOLS[(i + 3) % SYMBOLS.length],
-    left: `${1 + ((i * 3.45) % 98)}%`,
-    delay: `${startDelay + (i % 12) * 0.08}s`,
-    size: 18 + (i % 5) * 4,
-    duration: `${durationBase + (i % 5) * 0.2}s`,
+    symbol: symbols[(i + 2) % symbols.length],
+    left: `${1 + ((i * 6.1) % 98)}%`,
+    delay: `${startDelay + (i % 9) * 0.09}s`,
+    size: 18 + (i % 4) * 4,
+    duration: `${durationBase + (i % 4) * 0.22}s`,
   }));
 }
 
-const bottomWaveOne = makeBottomWave(34, 0.0, 4.8);
-const bottomWaveTwo = makeBottomWave(30, 0.75, 5.0);
-const topWaveOne = makeTopWave(30, 0.2, 4.2);
-const topWaveTwo = makeTopWave(26, 0.95, 4.35);
+function makeBurstItems(symbols: string[]) {
+  return Array.from({ length: 14 }, (_, i) => ({
+    symbol: symbols[i % symbols.length],
+    angle: `${i * 26}deg`,
+    distance: `${110 + (i % 5) * 16}px`,
+    delay: `${0.9 + (i % 8) * 0.05}s`,
+    size: 18 + (i % 4) * 4,
+  }));
+}
 
-const burstItems = Array.from({ length: 24 }, (_, i) => ({
-  symbol: SYMBOLS[i % SYMBOLS.length],
-  angle: `${i * 15}deg`,
-  distance: `${120 + (i % 6) * 18}px`,
-  delay: `${1.0 + (i % 10) * 0.05}s`,
-  size: 18 + (i % 4) * 4,
-}));
-
-export default function LetterCelebration({ show }: Props) {
+export default function LetterCelebration({
+  show,
+  symbols = DEFAULT_SYMBOLS,
+  centerSymbol = "✨",
+}: Props) {
   if (!show) return null;
+
+  const bottomWaveOne = makeBottomWave(16, 0.0, 4.8, symbols);
+  const bottomWaveTwo = makeBottomWave(12, 0.75, 5.0, symbols);
+  const topWaveOne = makeTopWave(14, 0.2, 4.2, symbols);
+  const topWaveTwo = makeTopWave(10, 0.95, 4.35, symbols);
+  const burstItems = makeBurstItems(symbols);
 
   return (
     <>
@@ -68,12 +79,12 @@ export default function LetterCelebration({ show }: Props) {
             opacity: 0;
             transform: translate3d(0, 46px, 0) scale(0.72) rotate(0deg);
           }
-          10% {
-            opacity: 1;
+          12% {
+            opacity: 0.78;
           }
           100% {
             opacity: 0;
-            transform: translate3d(0, -125vh, 0) scale(1.18) rotate(18deg);
+            transform: translate3d(0, -125vh, 0) scale(1.12) rotate(18deg);
           }
         }
 
@@ -82,12 +93,12 @@ export default function LetterCelebration({ show }: Props) {
             opacity: 0;
             transform: translate3d(0, -46px, 0) scale(0.76) rotate(0deg);
           }
-          10% {
-            opacity: 1;
+          12% {
+            opacity: 0.78;
           }
           100% {
             opacity: 0;
-            transform: translate3d(0, 118vh, 0) scale(1.14) rotate(-20deg);
+            transform: translate3d(0, 118vh, 0) scale(1.1) rotate(-20deg);
           }
         }
 
@@ -97,11 +108,11 @@ export default function LetterCelebration({ show }: Props) {
             transform: translate(-50%, -50%) rotate(var(--angle)) translateX(0) scale(0.35);
           }
           16% {
-            opacity: 1;
+            opacity: 0.9;
           }
           100% {
             opacity: 0;
-            transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--distance)) scale(1.15);
+            transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--distance)) scale(1.05);
           }
         }
 
@@ -110,7 +121,7 @@ export default function LetterCelebration({ show }: Props) {
             opacity: 0;
           }
           18% {
-            opacity: 0.42;
+            opacity: 0.32;
           }
           100% {
             opacity: 0;
@@ -123,12 +134,12 @@ export default function LetterCelebration({ show }: Props) {
             transform: scale(0.4);
           }
           20% {
-            opacity: 0.95;
+            opacity: 0.86;
             transform: scale(1);
           }
           100% {
             opacity: 0;
-            transform: scale(1.45);
+            transform: scale(1.35);
           }
         }
       `}</style>
@@ -148,7 +159,7 @@ export default function LetterCelebration({ show }: Props) {
             inset: 0,
             animation: "softFlash 2s ease-out forwards",
             background:
-              "radial-gradient(circle at center, rgba(255,255,255,0.62) 0%, rgba(255,240,245,0.28) 28%, rgba(255,240,245,0) 65%)",
+              "radial-gradient(circle at center, rgba(255,255,255,0.58) 0%, rgba(255,240,245,0.24) 28%, rgba(255,240,245,0) 65%)",
           }}
         />
 
@@ -164,7 +175,7 @@ export default function LetterCelebration({ show }: Props) {
             filter: "drop-shadow(0 8px 14px rgba(0,0,0,0.12))",
           }}
         >
-          ✨
+          {centerSymbol}
         </div>
 
         {[...bottomWaveOne, ...bottomWaveTwo].map((item, index) => (

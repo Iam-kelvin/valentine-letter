@@ -63,6 +63,7 @@ import { generateLetterWithGroq } from "@/lib/groq-letter";
 import { saveLetter } from "@/lib/db";
 import { hashPassword } from "@/lib/letter-auth";
 import { slugify, shortId } from "@/lib/slug";
+import { auth } from "@clerk/nextjs/server";
 
 const InputSchema = z.object({
   occasion: z.string().min(1),
@@ -85,6 +86,11 @@ const InputSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Please sign in to create letters." }, { status: 401 });
+    }
+
     const body = await req.json();
     const input = InputSchema.parse(body);
 
@@ -103,17 +109,18 @@ export async function POST(req: Request) {
     const passwordHash = input.password ? hashPassword(input.password) : null;
 
     await saveLetter({
-    slug,
-    occasion: input.occasion,
-    title: out.title,
-    preview: out.preview,
-    letter: out.letter,
-    ps: out.ps ?? "",
-    senderName: input.senderName,
-    recipientName: input.recipientName,
-    passwordHash,
-    expiresAt: input.expiresAt ?? null
-  });
+      slug,
+      userId,
+      occasion: input.occasion,
+      title: out.title,
+      preview: out.preview,
+      letter: out.letter,
+      ps: out.ps ?? "",
+      senderName: input.senderName,
+      recipientName: input.recipientName,
+      passwordHash,
+      expiresAt: input.expiresAt ?? null,
+    });
 
     return NextResponse.json({ slug });
   } catch (e: any) {

@@ -178,6 +178,16 @@ Make it warm, celebratory, personal, and joyful.
 End with a birthday-style closing.
 `;
 
+    case "fathers-day":
+      return `
+Write a Father's Day letter.
+Make it warm, grounded, appreciative, and natural.
+Keep it sincere without becoming overly poetic, flowery, or ceremonial.
+Focus on presence, effort, steadiness, sacrifice, guidance, protection, humor, and showing up.
+Do not invent children, fatherhood status, or family history that was not provided.
+End with a natural Father's Day style closing.
+`;
+
     case "appreciation":
       return `
 Write an appreciation letter.
@@ -188,6 +198,15 @@ Make it sincere, grateful, and natural.
       return `
 Write a thoughtful just-because letter.
 Make it emotionally real and unforced.
+`;
+
+    case "cheeky":
+      return `
+Write a cheeky letter.
+Make it playful, bold, flirty, teasing, and emotionally believable.
+Keep it PG-13 only.
+No explicit sexual content, explicit anatomy, graphic descriptions, coercion, pressure, or vulgarity.
+The flirtation should feel confident and tasteful, not crude.
 `;
 
     case "love":
@@ -268,6 +287,17 @@ For this Mother's Day letter to a girlfriend:
 `
       : "";
 
+  const cheekyRule =
+    input.occasion === "cheeky"
+      ? `
+For this cheeky letter:
+- Keep the confidence playful, not pushy.
+- Build tension with wit, implication, and charm.
+- Do not include explicit sexual content or graphic language.
+- Keep every line safe to send as a PG-13 flirtatious message.
+`
+      : "";
+
   return `
 Human tone rules:
 - Write like a real person, not like a greeting card generator.
@@ -280,6 +310,7 @@ Human tone rules:
 - Do not sound overly polished, robotic, or ceremonial.
 - Avoid repeating the same emotional words too often.
 ${extraGirlfriendRule}
+${cheekyRule}
 `;
 }
 
@@ -365,8 +396,14 @@ function buildClosingRule(occasion: string) {
   if (occasion === "mothers-day") {
     return `Use a fitting Mother's Day closing naturally. Examples include: "Happy Mother's Day 💐", "With love always", "With all my love", "Forever grateful". Only use relationship-specific closings like "Your proud child" if they clearly fit the sender role.`;
   }
+  if (occasion === "fathers-day") {
+    return `Use a fitting Father's Day closing naturally, warm and appreciative without becoming overly poetic.`;
+  }
   if (occasion === "birthday") {
     return `Use a birthday-themed closing naturally.`;
+  }
+  if (occasion === "cheeky") {
+    return `Use a playful, flirty closing naturally while staying PG-13.`;
   }
   return `Use a fitting emotional closing naturally.`;
 }
