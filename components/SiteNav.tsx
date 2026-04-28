@@ -1,11 +1,22 @@
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
-import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { getAnonymousProfileByUserId } from "@/lib/anonymous-db";
+import MobileNav from "./MobileNav";
+import UserNavChip from "./UserNavChip";
 
 export default async function SiteNav() {
   const { userId } = await auth();
-  const profile = userId ? await getAnonymousProfileByUserId(userId) : null;
+  const [profile, user] = userId
+    ? await Promise.all([getAnonymousProfileByUserId(userId), currentUser()])
+    : [null, null];
+  const userName =
+    user?.fullName ||
+    user?.username ||
+    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+    "Account";
+  const userEmail = user?.primaryEmailAddress?.emailAddress ?? null;
+  const userInitial = userName.trim().charAt(0).toUpperCase() || "U";
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-black/55 text-white backdrop-blur-xl">
@@ -17,7 +28,7 @@ export default async function SiteNav() {
           Letterly
         </Link>
 
-        <nav className="flex flex-wrap items-center justify-end gap-3">
+        <nav className="hidden flex-wrap items-center justify-end gap-3 md:flex">
           <Link href="/create" className={navLinkClass}>
             Write
           </Link>
@@ -35,7 +46,7 @@ export default async function SiteNav() {
                   My Link
                 </Link>
               ) : null}
-              <UserButton />
+              <UserNavChip name={userName} email={userEmail} initial={userInitial} />
             </>
           ) : (
             <>
@@ -51,6 +62,14 @@ export default async function SiteNav() {
             </>
           )}
         </nav>
+
+        <MobileNav
+          isSignedIn={!!userId}
+          publicLink={profile ? `/u/${profile.username}` : null}
+          userName={userName}
+          userEmail={userEmail}
+          userInitial={userInitial}
+        />
       </div>
     </header>
   );
