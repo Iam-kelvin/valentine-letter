@@ -88,14 +88,65 @@ const OutputSchema = z.object({
   ps: z.string().max(280),
 });
 
-const lengthRanges: Record<string, { min: number; max: number }> = {
-  short: { min: 120, max: 180 },
-  medium: { min: 220, max: 320 },
-  long: { min: 380, max: 520 },
+type GeneratedLetter = z.infer<typeof OutputSchema>;
+type QualityTier = "standard" | "premium";
+
+const lengthRanges: Record<QualityTier, Record<string, { min: number; max: number }>> = {
+  standard: {
+    short: { min: 80, max: 140 },
+    medium: { min: 180, max: 260 },
+  },
+  premium: {
+    short: { min: 180, max: 260 },
+    medium: { min: 320, max: 480 },
+    long: { min: 520, max: 750 },
+  },
 };
 
 function wordCount(s: string) {
   return (s.trim().match(/\S+/g) ?? []).length;
+}
+
+function cleanOneLine(value: unknown) {
+  return String(value ?? "").replace(/\s+/g, " ").trim();
+}
+
+function clampText(value: unknown, max: number, fallback: string) {
+  const clean = cleanOneLine(value) || fallback;
+  if (clean.length <= max) return clean;
+
+  const slice = clean.slice(0, max).trimEnd();
+  const lastSpace = slice.lastIndexOf(" ");
+
+  if (lastSpace > Math.floor(max * 0.6)) {
+    return slice.slice(0, lastSpace).trimEnd();
+  }
+
+  return slice;
+}
+
+function normalizeGeneratedLetter(raw: unknown) {
+  const value =
+    raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const letter = String(value.letter ?? "").trim();
+  const title = clampText(value.title, 80, "A Letter From the Heart");
+  const previewSource =
+    cleanOneLine(value.preview) ||
+    cleanOneLine(letter.split(/\n\s*\n/)[0]) ||
+    "A personal letter written with care.";
+
+  return {
+    title,
+    preview: clampText(previewSource, 140, "A personal letter written with care."),
+    letter,
+    ps: clampText(value.ps, 280, ""),
+  };
+}
+
+function getQualityTier(input: { qualityTier?: unknown }): QualityTier {
+  return input.qualityTier === "premium" || input.qualityTier === "signature"
+    ? "premium"
+    : "standard";
 }
 
 function getMothersDayRecipientMode(recipientType?: string | null) {
@@ -130,7 +181,11 @@ function getMothersDayRecipientMode(recipientType?: string | null) {
   return "generic";
 }
 
-function buildOccasionRules(occasion: string, recipientType?: string) {
+function buildOccasionRules(
+  occasion: string,
+  recipientType?: string,
+  occasionDetails?: string | null
+) {
   switch (occasion) {
     case "mothers-day": {
       const mode = getMothersDayRecipientMode(recipientType);
@@ -207,6 +262,202 @@ Make it playful, bold, flirty, teasing, and emotionally believable.
 Keep it PG-13 only.
 No explicit sexual content, explicit anatomy, graphic descriptions, coercion, pressure, or vulgarity.
 The flirtation should feel confident and tasteful, not crude.
+`;
+
+    case "apology":
+      return `
+Write an apology letter.
+Tone: sincere, accountable, emotionally honest.
+
+Rules:
+- DO NOT be defensive.
+- DO NOT over-explain or turn the letter into a list of excuses.
+- Acknowledge the mistake clearly and plainly.
+- Express remorse without asking the recipient to comfort the sender.
+- Show growth through specific ownership, not dramatic promises.
+- No manipulation, guilt-tripping, pressure, or self-pity.
+
+Structure:
+- Open with direct accountability.
+- Name the impact or hurt without minimizing it.
+- Say what the sender is sorry for.
+- Close with respect for the recipient's feelings and space.
+`;
+
+    case "congratulations": {
+      const achievement = String(occasionDetails || "").trim();
+
+      return `
+Write a congratulations letter.
+Tone: celebratory, uplifting.
+${achievement ? `Specific achievement: "${achievement}"` : "Specific achievement: not provided. Use a neutral but still concrete phrase like \"this milestone you reached\" or \"the step you worked so hard to reach,\" and lean on any supplied details."}
+
+Rules:
+- If a specific achievement is provided, the letter MUST reference it naturally.
+- Avoid generic phrases like "your achievement" without naming or describing the achievement.
+- Avoid generic praise like "you are amazing" unless it is tied to something specific.
+- Mention effort, journey, growth, persistence, struggle, courage, or sacrifice if relevant.
+- Make the celebration feel earned and personal.
+- Keep the energy bright without sounding like a formal award speech.
+
+Structure:
+- Start with the specific win or milestone.
+- Reflect on the path that made it meaningful.
+- Celebrate who they became in the process.
+- End with pride, joy, and encouragement for what comes next.
+`;
+    }
+
+    case "closure":
+      return `
+Write a closure letter.
+Tone: calm, reflective, emotionally mature.
+
+Rules:
+- No begging.
+- No blaming.
+- Accept the ending clearly.
+- Express gratitude where appropriate, without rewriting the past as perfect.
+- Create a clean emotional ending.
+- Do not use the letter to reopen the relationship or demand answers.
+
+Structure:
+- Begin from acceptance.
+- Reflect briefly on what mattered.
+- Release blame, pressure, and unfinished arguments.
+- End with a peaceful goodbye.
+`;
+
+    case "situationship":
+      return `
+Write a situationship letter.
+Tone: honest, slightly conflicted, modern.
+
+Rules:
+- Acknowledge the ambiguity directly.
+- Avoid overly poetic language.
+- Feel real, slightly messy, not perfect.
+- Do not force certainty if the provided details are uncertain.
+- Make the tension conversational, not theatrical.
+
+Structure:
+- Start with what has been hard to say plainly.
+- Name the mixed signals, unclear labels, or emotional gray area.
+- Say what the sender honestly feels or needs.
+- End with a grounded, human note rather than a dramatic ultimatum.
+`;
+
+    case "confession":
+      return `
+Write a confession letter.
+Tone: vulnerable, direct, emotionally risky.
+
+Rules:
+- Build tension gradually.
+- Include a clear reveal moment where the feeling is finally named.
+- Avoid cliches like "from the moment I saw you" unless the user provided that exact detail.
+- Keep the vulnerability brave and specific, not melodramatic.
+- Do not pressure the recipient to respond a certain way.
+
+Structure:
+- Begin with hesitation or the reason it has been hard to say.
+- Let the emotion gather through concrete observations.
+- Make one unmistakable confession.
+- End with honesty and respect for whatever they feel.
+`;
+
+    case "miss-you":
+      return `
+Write a miss-you letter.
+Tone: soft, emotional, simple.
+
+Rules:
+- Keep it relatively short even if a longer length is requested.
+- Focus on absence, longing, and the feeling of missing them.
+- Avoid over-explaining the relationship history.
+- Use plain language and quiet emotion.
+- Do not make the recipient feel guilty for being absent.
+
+Structure:
+- Open with the absence.
+- Mention one or two specific things the sender misses.
+- Let the feeling stay simple.
+- Close gently.
+`;
+
+    case "thank-you":
+      return `
+Write a thank-you letter.
+Tone: warm, grateful, grounded.
+
+Rules:
+- Include specific appreciation.
+- Avoid generic gratitude phrases like "words cannot express" unless grounded in details.
+- Name what the recipient did, gave, taught, or helped carry.
+- Keep gratitude practical, personal, and sincere.
+
+Structure:
+- Start with the specific reason for thanks.
+- Describe the impact it had on the sender.
+- Appreciate the recipient's character through that action.
+- End warmly without sounding formal.
+`;
+
+    case "friend":
+      return `
+Write a friendship letter.
+Tone: casual, warm, authentic.
+
+Rules:
+- Less formal.
+- More conversational.
+- Include personality, humor, quirks, or familiar rhythm when details allow.
+- Do not sound like a romantic love letter.
+- Avoid ceremonial or overly polished language.
+
+Structure:
+- Open like someone texting or talking to a close friend.
+- Include a specific shared memory, trait, or running joke if provided.
+- Let affection feel easy and unforced.
+- End with warmth, loyalty, or a casual promise to keep showing up.
+`;
+
+    case "faith":
+      return `
+Write a faith letter.
+Tone: reflective, respectful, spiritual.
+
+Rules:
+- Prayer language is allowed when it fits the sender and recipient.
+- Avoid sounding like a sermon.
+- Keep it personal, not preachy.
+- Do not lecture, shame, or imply the recipient lacks faith.
+- Spiritual references should support the emotion, not replace it.
+
+Structure:
+- Begin with a personal reflection, concern, gratitude, or encouragement.
+- Include prayer, blessing, scripture-like language, or faith language only if natural.
+- Keep the focus on care and hope.
+- End gently, with warmth and respect.
+`;
+
+    case "ex":
+      return `
+Write a letter to an ex.
+Tone: emotional but controlled.
+
+Rules:
+- No desperation.
+- No manipulation.
+- It can express longing OR acceptance depending on the user's details.
+- Do not beg for another chance unless the user explicitly asks, and even then keep it respectful.
+- Do not blame the recipient or rewrite the breakup as one person's fault.
+
+Structure:
+- Start with a controlled emotional truth.
+- Reflect on what remains, what changed, or what is being released.
+- Keep longing restrained or acceptance clear.
+- End without pressure.
 `;
 
     case "love":
@@ -315,24 +566,28 @@ ${cheekyRule}
 }
 
 function buildQualityTierRules(input: any) {
-  const tier = input.qualityTier === "premium" ? "premium" : "standard";
+  const tier = getQualityTier(input);
 
   if (tier === "premium") {
     return `
-Quality tier: premium
+Quality tier: signature
 
-Premium writing rules:
-- The writing should feel deeply personal, natural, and emotionally believable.
-- Use more nuanced emotional pacing.
-- Vary sentence rhythm more intentionally.
-- Avoid generic greeting-card phrasing.
-- Avoid sounding overly polished or formulaic.
-- Let some lines feel intimate, lived-in, and slightly imperfect in a human way.
-- Use specific, grounded emotional observations when details are available.
-- Open with a stronger emotional hook.
-- End with a more memorable and moving closing.
-- Make the preview feel sharper, more elegant, and less generic.
-- The title should feel specific and emotionally appealing, not templated.
+Signature writing rules:
+- Human is better than perfect. Do not make the writing overly poetic or dramatic.
+- First paragraph must hook emotionally, feel personal, and avoid generic starts like "I just want to say" or "On this special day."
+- Mix short and longer sentences; avoid overly symmetrical sentence patterns.
+- Include at least one grounded emotional observation, such as a noticed habit, quiet effort, specific absence, or small human detail.
+- Make the message fuller and more emotionally nuanced than standard, while staying believable.
+- Strengthen the opening, closing, title, and preview.
+- Use more personalization when details are provided.
+- Avoid stacked adjectives like "love, strength, grace, beauty."
+- Avoid repeating the same emotional words too often.
+- Avoid generic greeting-card phrasing and obvious cliches, especially "truly special" and "from the bottom of my heart."
+- Let some phrasing feel slightly imperfect, conversational, and human.
+- Add subtle rhythm variation, emotional pauses, and human-like phrasing without becoming ornate.
+- End with a personal, natural closing that is not generic, overly formal, or stiff.
+- Avoid closings like "Yours sincerely" and avoid "With deepest gratitude" unless the occasion truly calls for formal gratitude.
+- Make the preview sharper, more intimate, and less templated.
 `;
   }
 
@@ -340,7 +595,16 @@ Premium writing rules:
 Quality tier: standard
 
 Standard writing rules:
-- Keep the writing warm, clear, natural, and emotionally pleasant.
+- Keep the writing simple, clean, emotionally clear, warm, and natural.
+- Use short or medium pacing only.
+- Make the result complete and good enough to send without any upgrade.
+- Use recipientName, senderName, recipientType, tone, and occasionDetails when available.
+- Include specific details when provided, but do not invent private facts.
+- Avoid heavy poetic language.
+- Avoid overly complex, ornate, or long phrasing.
+- Keep sentence structure easy to read.
+- Avoid obvious cliches where possible.
+- Avoid sounding robotic, generic, or intentionally limited.
 - Avoid obvious clichés where possible.
 - Keep the structure simple and readable.
 - Make the title and preview clear and appropriate.
@@ -381,15 +645,68 @@ Language mode: english
 
 function getEffectiveLength(input: any) {
   const requested = input.length || "medium";
-  const tier = input.qualityTier === "premium" ? "premium" : "standard";
+  const tier = getQualityTier(input);
+  const ranges = lengthRanges[tier];
 
-  if (tier === "premium") {
-    if (requested === "short") return { min: 180, max: 260 };
-    if (requested === "medium") return { min: 320, max: 460 };
-    return { min: 520, max: 760 };
+  if (tier === "standard") {
+    return requested === "short" ? ranges.short : ranges.medium;
   }
 
-  return lengthRanges[requested] ?? lengthRanges.medium;
+  return ranges[requested] ?? ranges.medium;
+}
+
+function needsSignaturePolish(out: GeneratedLetter, occasion?: string) {
+  const text = `${out.title}\n${out.preview}\n${out.letter}\n${out.ps || ""}`;
+  const firstParagraph = out.letter.trim().split(/\n\s*\n/)[0] || out.letter.trim();
+  const closingText = out.letter.slice(-500);
+  const allowsFormalGratitude = occasion === "thank-you" || occasion === "appreciation";
+
+  const clichePatterns = [
+    /words cannot express/i,
+    /from the bottom of my heart/i,
+    /you mean the world to me/i,
+    /more than words/i,
+    /my heart is full/i,
+    /grateful beyond words/i,
+    /truly special/i,
+    /constant source of comfort/i,
+    /love,\s*strength,\s*grace,\s*(and\s*)?beauty/i,
+    /beautiful soul/i,
+    /light up my life/i,
+  ];
+
+  const genericPatterns = [
+    /you are amazing/i,
+    /you are so special/i,
+    /you mean so much to me/i,
+    /i am so lucky to have you/i,
+    /thank you for everything/i,
+    /i appreciate everything you do/i,
+    /you have always been there for me/i,
+    /i will always cherish/i,
+  ];
+
+  const genericOpeningPatterns = [
+    /^\s*i just want(?:ed)? to say/i,
+    /^\s*on this special day/i,
+    /^\s*i am writing this letter/i,
+    /^\s*i wanted to take a moment/i,
+    /^\s*where do i even begin/i,
+  ];
+
+  const formalClosingPatterns = [
+    /yours sincerely/i,
+    /sincerely yours/i,
+    /respectfully yours/i,
+    ...(allowsFormalGratitude ? [] : [/with deepest gratitude/i]),
+  ];
+
+  const clicheScore = clichePatterns.filter((pattern) => pattern.test(text)).length;
+  const genericScore = genericPatterns.filter((pattern) => pattern.test(text)).length;
+  const hasGenericOpening = genericOpeningPatterns.some((pattern) => pattern.test(firstParagraph));
+  const hasFormalClosing = formalClosingPatterns.some((pattern) => pattern.test(closingText));
+
+  return clicheScore > 0 || genericScore >= 2 || hasGenericOpening || hasFormalClosing;
 }
 
 function buildClosingRule(occasion: string) {
@@ -405,12 +722,46 @@ function buildClosingRule(occasion: string) {
   if (occasion === "cheeky") {
     return `Use a playful, flirty closing naturally while staying PG-13.`;
   }
+  if (occasion === "apology") {
+    return `Close with accountability and respect for the recipient's feelings, without asking for instant forgiveness.`;
+  }
+  if (occasion === "closure") {
+    return `Close with calm acceptance, release, and a clean goodbye.`;
+  }
+  if (occasion === "situationship") {
+    return `Close with honest uncertainty or a grounded request for clarity, not a dramatic ultimatum.`;
+  }
+  if (occasion === "confession") {
+    return `Close after the clear reveal with honesty and respect, without pressuring the recipient.`;
+  }
+  if (occasion === "miss-you") {
+    return `Close softly and simply, centered on missing them.`;
+  }
+  if (occasion === "thank-you") {
+    return `Close with specific gratitude and warmth, not a generic thank-you line.`;
+  }
+  if (occasion === "friend") {
+    return `Close casually and warmly, like something a real friend would say.`;
+  }
+  if (occasion === "faith") {
+    return `Close with a gentle prayer, blessing, or hopeful faith note without sounding preachy.`;
+  }
+  if (occasion === "ex") {
+    return `Close without desperation, pressure, or emotional bargaining.`;
+  }
+  if (occasion === "congratulations") {
+    return `Close with celebration, pride, and encouragement for what comes next.`;
+  }
   return `Use a fitting emotional closing naturally.`;
 }
 
 function buildUserPrompt(input: any) {
   const lines: string[] = [];
   const add = (k: string, v: any) => v && lines.push(`${k}: "${String(v)}"`);
+  const qualityTier = getQualityTier(input);
+  const requestedLength = input.length || "medium";
+  const effectiveLength =
+    qualityTier === "standard" && requestedLength === "long" ? "medium" : requestedLength;
 
   add("occasion", input.occasion);
   add("senderName", input.senderName);
@@ -418,7 +769,9 @@ function buildUserPrompt(input: any) {
   add("senderRole", input.senderRole);
   add("recipientType", input.recipientType);
   add("tone", input.tone);
-  add("length", input.length);
+  add("length", effectiveLength);
+  add("qualityTier", qualityTier);
+  add("occasionDetails", input.occasionDetails);
   add("privateDetailLevel", input.privateDetailLevel);
   add("callToAction", input.callToAction);
 
@@ -454,10 +807,12 @@ Title and preview rules:
 - Do not use placeholder language.
 - Make the title feel like something a real person would want to send.
 - Make the preview feel inviting and emotionally grounded.
+- Title must be 80 characters or fewer.
+- Preview must be 140 characters or fewer.
 `;
 
   return `
-${buildOccasionRules(input.occasion, input.recipientType)}
+${buildOccasionRules(input.occasion, input.recipientType, input.occasionDetails)}
 ${titlePreviewRules}
 ${buildHumanToneRules(input)}
 ${buildQualityTierRules(input)}
@@ -466,7 +821,9 @@ ${buildLanguageRules(input)}
 Constraints:
 - Tone: ${input.tone || "natural"}
 - Target word count for "letter": ${min}-${max}
+- Keep "title" at 80 characters or fewer, "preview" at 140 characters or fewer, and "ps" at 280 characters or fewer
 - Use at least 3 specific details if provided
+- Let the occasion change the structure, pacing, and diction; do not reuse generic emotional wording across categories
 - privateDetailLevel=${input.privateDetailLevel}
 - ${buildClosingRule(input.occasion)}
 - Keep names exactly as provided
@@ -488,13 +845,14 @@ async function callGroq(input: any, fix?: string) {
   });
 
   const text = resp.choices[0]?.message?.content ?? "";
-  return OutputSchema.parse(JSON.parse(text));
+  return OutputSchema.parse(normalizeGeneratedLetter(JSON.parse(text)));
 }
 
 export async function generateLetterWithGroq(input: any) {
   const out1 = await callGroq(input);
   const { min, max } = getEffectiveLength(input);
   const wc = wordCount(out1.letter);
+  const qualityTier = getQualityTier(input);
 
   const recipientMode =
     input.occasion === "mothers-day"
@@ -510,13 +868,9 @@ export async function generateLetterWithGroq(input: any) {
 
   const needsLengthFix = wc < min || wc > max;
 
-  const needsPremiumPolish =
-    input.qualityTier === "premium" &&
-    /your love, strength, grace, and beauty|truly special gift|constant source of comfort, strength, and joy|filled with so much gratitude/i.test(
-      `${out1.title}\n${out1.preview}\n${out1.letter}\n${out1.ps || ""}`
-    );
+  const needsSignatureRewrite = qualityTier === "premium" && needsSignaturePolish(out1, input.occasion);
 
-  if (!needsLengthFix && !invalidMotherAssumption && !needsPremiumPolish) {
+  if (!needsLengthFix && !invalidMotherAssumption && !needsSignatureRewrite) {
     return out1;
   }
 
@@ -529,12 +883,15 @@ Do NOT frame the message as celebrating her as a mother.
 Do NOT mention children or pregnancy.
 Keep it emotionally rich, natural, and suitable for Mother's Day in a soft, indirect way.
 JSON only.`;
-  } else if (needsPremiumPolish) {
-    extraFix = `Rewrite to feel more human and less like a greeting card.
-Reduce clichés and generic praise.
-Vary sentence rhythm more.
-Make the writing feel more intimate, grounded, and natural.
-Keep the same meaning and emotional tone.
+  } else if (needsSignatureRewrite) {
+    extraFix = `Make this feel more human, reduce cliches, improve emotional flow, vary sentence rhythm.
+Rewrite the opening so it hooks emotionally and does not start with "I just want to say" or "On this special day."
+Include at least one grounded emotional observation.
+Remove stacked adjectives and phrases like "love, strength, grace, beauty", "truly special", and "from the bottom of my heart."
+Make the closing personal, natural, and not overly formal.
+Allow slight imperfection and conversational phrasing; avoid overly symmetrical sentences.
+Keep the same meaning, occasion rules, names, and details.
+Rewrite letter to ${min}-${max} words.
 Return JSON only.`;
   }
 

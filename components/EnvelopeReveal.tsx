@@ -21,9 +21,9 @@ export default function EnvelopeReveal({
   letter,
   ps,
   ctaHref = "/create",
-  ctaTitle = "Aww 😌 want one like this?",
+  ctaTitle = "Aww \u{1F60C} want one like this?",
   ctaBody = "Now go make one for your person in seconds, then share the link.",
-  ctaButtonText = "Create my letter 💌",
+  ctaButtonText = "Create my letter \u{1F48C}",
 }: Props) {
   const [opened, setOpened] = React.useState(false);
 
@@ -85,11 +85,11 @@ export default function EnvelopeReveal({
                 border: "1px solid rgba(255,255,255,0.22)",
               }}
             >
-              <span style={{ fontSize: 22 }}>♥</span>
+              <span style={{ fontSize: 22 }}>{"\u2665"}</span>
             </div>
 
             <div style={{ opacity: 0.75, fontSize: 14 }}>
-              Tap to open <span style={{ marginLeft: 6 }}>💌</span>
+              Tap to open <span style={{ marginLeft: 6 }}>{"\u{1F48C}"}</span>
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function EnvelopeReveal({
             </div>
           ) : null}
 
-          {/* ✅ CTA AFTER OPEN */}
+          {/* CTA after open */}
           <div
             style={{
               marginTop: 22,

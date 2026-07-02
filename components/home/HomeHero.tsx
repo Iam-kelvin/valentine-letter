@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { useEffect, useState } from "react";
 
 type RecentLetter = {
   slug: string;
@@ -48,6 +51,65 @@ const heroOccasions = [
   },
 ];
 
+const previewSamples = [
+  {
+    label: "Mother's Day",
+    tone: "heartfelt",
+    symbol: "\uD83D\uDC90",
+    quote: "Now I see your love in everything.",
+    particles: ["\uD83D\uDC8C", "\u2728", "\uD83C\uDF38", "\uD83D\uDC90", "\u2764\uFE0F"],
+    widths: ["82%", "68%", "74%", "54%"],
+  },
+  {
+    label: "Birthday",
+    tone: "warm",
+    symbol: "\uD83C\uDF82",
+    quote: "I hope today reminds you how loved you already are.",
+    particles: ["\uD83C\uDF82", "\uD83C\uDF88", "\uD83C\uDF89", "\u2728", "\uD83D\uDC8C"],
+    widths: ["70%", "86%", "64%", "58%"],
+  },
+  {
+    label: "Romantic",
+    tone: "soft",
+    symbol: "\u2764\uFE0F",
+    quote: "Somehow, loving you still feels new to me.",
+    particles: ["\u2764\uFE0F", "\uD83D\uDC8C", "\u2728", "\uD83C\uDF39", "\uD83D\uDC9E"],
+    widths: ["78%", "60%", "82%", "50%"],
+  },
+  {
+    label: "Apology",
+    tone: "accountable",
+    symbol: "\uD83E\uDD0D",
+    quote: "I was wrong, and I do not want to hide from that.",
+    particles: ["\uD83E\uDD0D", "\uD83D\uDC8C", "\u2728", "\uD83D\uDD4A\uFE0F", "\uD83C\uDF19"],
+    widths: ["76%", "58%", "88%", "62%"],
+  },
+  {
+    label: "Congratulations",
+    tone: "proud",
+    symbol: "\uD83C\uDF89",
+    quote: "You earned this long before everyone saw it.",
+    particles: ["\uD83C\uDF89", "\uD83C\uDFC6", "\u2728", "\u2B50", "\uD83D\uDC8C"],
+    widths: ["66%", "84%", "72%", "48%"],
+  },
+  {
+    label: "Closure",
+    tone: "calm",
+    symbol: "\uD83C\uDF19",
+    quote: "I can let this end without pretending it meant nothing.",
+    particles: ["\uD83C\uDF19", "\uD83D\uDC8C", "\u2728", "\uD83E\uDD0D", "\u2B50"],
+    widths: ["72%", "62%", "80%", "56%"],
+  },
+  {
+    label: "Situationship",
+    tone: "unfiltered",
+    symbol: "\uD83D\uDCAD",
+    quote: "I do not know what we are, but I know this feels real.",
+    particles: ["\uD83D\uDCAD", "\uD83D\uDD25", "\uD83D\uDC8C", "\u2728", "\uD83C\uDF19"],
+    widths: ["88%", "52%", "76%", "64%"],
+  },
+];
+
 export function HomeHero({
   isSignedIn,
   recentLetters = [],
@@ -73,6 +135,12 @@ export function HomeHero({
           18% { opacity: 0.55; }
           100% { opacity: 0; transform: translate3d(18px, -160px, 0) scale(1.08); }
         }
+
+        @keyframes letterlyPreviewSwap {
+          0% { opacity: 0; transform: translateY(8px); }
+          14%, 82% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-6px); }
+        }
       `}</style>
 
       <div>
@@ -86,8 +154,8 @@ export function HomeHero({
         </h1>
 
         <p className="mt-7 max-w-2xl text-base leading-8 text-white/68 sm:text-lg">
-          Create personal letters for love, birthdays, Mother&apos;s Day,
-          Father&apos;s Day, appreciation, anonymous messages, and the moments
+          Create personal letters for love, birthdays, apologies, confessions,
+          thank-you notes, closure, faith, anonymous messages, and the moments
           that deserve better than a quick text.
         </p>
 
@@ -147,12 +215,24 @@ export function HomeHero({
 }
 
 function AnimatedLetterPreview() {
+  const [sampleIndex, setSampleIndex] = useState(0);
+  const sample = previewSamples[sampleIndex];
+  const nextSample = previewSamples[(sampleIndex + 1) % previewSamples.length];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setSampleIndex((index) => (index + 1) % previewSamples.length);
+    }, 5200);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.075),rgba(255,255,255,0.035))] p-6">
       <div className="pointer-events-none absolute inset-0">
-        {["💌", "✨", "🌸", "❤️", "🎈"].map((symbol, index) => (
+        {sample.particles.map((symbol, index) => (
           <span
-            key={symbol}
+            key={`${sample.label}-${symbol}-${index}`}
             className="absolute text-xl"
             style={{
               left: `${12 + index * 18}%`,
@@ -165,23 +245,27 @@ function AnimatedLetterPreview() {
         ))}
       </div>
 
-      <div className="relative z-10">
+      <div
+        key={sample.label}
+        className="relative z-10"
+        style={{ animation: "letterlyPreviewSwap 5.2s ease-in-out both" }}
+      >
         <div className="mb-7 flex items-center justify-between">
           <span className="rounded-full border border-rose-200/15 bg-rose-100/10 px-3 py-1 text-xs font-bold text-rose-100/80">
-            Mother&apos;s Day · heartfelt
+            {sample.symbol} {sample.label} - {sample.tone}
           </span>
           <span className="text-xl" style={{ animation: "letterlyFloat 4s ease-in-out infinite" }}>
-            💐
+            {sample.symbol}
           </span>
         </div>
 
         <p className="text-2xl font-semibold leading-snug text-white">
-          &ldquo;Now I see your love in everything.&rdquo;
+          &ldquo;{sample.quote}&rdquo;
         </p>
 
         <div className="mt-8 space-y-3">
-          {["82%", "68%", "74%", "54%"].map((width, index) => (
-            <div key={width} className="h-3 rounded-full bg-white/8">
+          {sample.widths.map((width, index) => (
+            <div key={`${sample.label}-${width}`} className="h-3 rounded-full bg-white/8">
               <div
                 className="h-full rounded-full bg-rose-100/28"
                 style={{
@@ -203,6 +287,10 @@ function AnimatedLetterPreview() {
             </div>
           ))}
         </div>
+
+        <div className="mt-4 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-white/32">
+          Next: {nextSample.label}
+        </div>
       </div>
     </div>
   );
@@ -212,7 +300,7 @@ function PublicProofPanel() {
   return (
     <div className="mt-4 grid gap-3 sm:grid-cols-3">
       <div className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
-        <p className="text-2xl font-semibold text-white">8</p>
+        <p className="text-2xl font-semibold text-white">18</p>
         <p className="mt-1 text-xs leading-5 text-white/55">occasion flows</p>
       </div>
       <div className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">

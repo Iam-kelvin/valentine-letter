@@ -1,54 +1,13 @@
 import Link from "next/link";
+import { OCCASIONS } from "@/lib/occasions";
 
 const occasions = [
-  {
-    title: "Love",
-    emoji: "❤️",
-    description: "Sweet, romantic, soft, playful, or deeply emotional.",
-    href: "/create/love",
-  },
-  {
-    title: "Mother's Day",
-    emoji: "🌸",
-    description: "For mothers, mother figures, and women worth honoring.",
-    href: "/create/mothers-day",
-  },
-  {
-    title: "Father's Day",
-    emoji: "🧔🏾‍♂️",
-    description: "For fathers, father figures, and the men who showed up.",
-    href: "/create/fathers-day",
-  },
-  {
-    title: "Women's Day",
-    emoji: "🌷",
-    description: "Celebrate her strength, presence, beauty, and impact.",
-    href: "/create/womens-day",
-  },
-  {
-    title: "Birthday",
-    emoji: "🎂",
-    description: "Make their day personal, warm, joyful, and unforgettable.",
-    href: "/create/birthday",
-  },
-  {
-    title: "Appreciation",
-    emoji: "🙏",
-    description: "Say thank you in a way they'll actually remember.",
-    href: "/create/appreciation",
-  },
-  {
-    title: "Just Because",
-    emoji: "💌",
-    description: "No holiday needed. Just say what's on your heart.",
-    href: "/create/just-because",
-  },
-  {
-    title: "Cheeky",
-    emoji: "😏",
-    description: "Playful, bold, flirty, and a little risky.",
-    href: "/create/cheeky",
-  },
+  ...Object.values(OCCASIONS).map((occasion) => ({
+    title: occasion.label,
+    emoji: occasion.emoji,
+    description: occasion.subtitle,
+    href: occasion.path,
+  })),
   {
     title: "Anonymous",
     emoji: "👀",

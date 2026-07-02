@@ -337,6 +337,96 @@ function getSuggestions(occasionKey: string) {
         cta: 'e.g., "So... are we going to keep pretending or say it properly?"',
       };
 
+    case "apology":
+      return {
+        memories: "- What I said that hurt you\n- The moment I realized I was wrong\n- What I should have handled differently",
+        insideJokes: "- Only include this if it softens the note without dodging accountability",
+        qualities: "- Patient\n- Honest\n- Deserving of respect\n- Someone I should have listened to better",
+        futurePlans: "- Taking responsibility without excuses\n- Giving you space if you need it\n- Doing better in a specific way",
+        cta: 'e.g., "I am sorry, and I understand if you need time."',
+      };
+
+    case "congratulations":
+      return {
+        memories: "- The late nights you kept going\n- The first step you took toward this\n- The moment I knew you could do it",
+        insideJokes: "- The phrase you kept saying during the journey\n- The little celebration we promised",
+        qualities: "- Disciplined\n- Brave\n- Consistent\n- Hardworking",
+        futurePlans: "- Bigger doors opening\n- Taking a real moment to celebrate\n- Watching you grow even more",
+        cta: 'e.g., "I am so proud of how far you have come."',
+      };
+
+    case "closure":
+      return {
+        memories: "- What I am grateful for\n- What this chapter taught me\n- The moment I knew things had changed",
+        insideJokes: "- A small memory that can be held gently, not used to reopen things",
+        qualities: "- Important to me\n- Part of my growth\n- Someone I once cared for deeply",
+        futurePlans: "- Letting go with peace\n- Wishing you well\n- Moving forward without bitterness",
+        cta: 'e.g., "I will always wish you well, but I am letting this go."',
+      };
+
+    case "miss-you":
+      return {
+        memories: "- The sound of your laugh\n- The place that feels quieter now\n- The small habit of yours I keep noticing is gone",
+        insideJokes: "- The line I almost text you\n- The joke that is not as funny without you",
+        qualities: "- Comforting\n- Familiar\n- Easy to be around\n- Hard to replace",
+        futurePlans: "- Hearing your voice soon\n- Sitting together again\n- One simple moment I wish we could repeat",
+        cta: 'e.g., "I miss you. That is really all I wanted to say."',
+      };
+
+    case "thank-you":
+      return {
+        memories: "- The day you showed up for me\n- The advice I still use\n- The help you gave when I was overwhelmed",
+        insideJokes: "- A small shared moment from that season\n- Something you said that still makes me smile",
+        qualities: "- Thoughtful\n- Reliable\n- Generous\n- Present",
+        futurePlans: "- Returning the kindness when I can\n- Staying grateful out loud\n- Carrying what you taught me forward",
+        cta: 'e.g., "Thank you for that specific thing. It meant more than you know."',
+      };
+
+    case "situationship":
+      return {
+        memories: "- The almost-date that felt like a date\n- The late replies I pretended did not bother me\n- The moment things started feeling confusing",
+        insideJokes: "- The teasing that made things feel less casual\n- The nickname we never explained",
+        qualities: "- Easy to talk to\n- Hard to read\n- Familiar\n- A little dangerous for my peace",
+        futurePlans: "- Being honest about what this is\n- Asking where we actually stand\n- Choosing clarity over guessing",
+        cta: 'e.g., "I just need to know if this is something or if I am imagining it."',
+      };
+
+    case "ex":
+      return {
+        memories: "- A good moment I can still admit mattered\n- What I miss without wanting to beg\n- What I finally understand now",
+        insideJokes: "- A memory that feels tender, not manipulative\n- Something that used to be ours",
+        qualities: "- Familiar\n- Important once\n- Hard to forget\n- Part of my story",
+        futurePlans: "- Accepting what changed\n- Healing properly\n- Letting the good parts stay good",
+        cta: 'e.g., "I still care, but I am not writing this to pressure you."',
+      };
+
+    case "confession":
+      return {
+        memories: "- The first time I caught myself looking at you differently\n- The conversation I replayed too many times\n- The moment I almost said it",
+        insideJokes: "- The joke that made me realize I liked you\n- The thing we say that feels like more than a joke",
+        qualities: "- Easy to like\n- Unintentionally charming\n- Kind\n- Hard to ignore",
+        futurePlans: "- Finally being honest\n- Letting you know without pressure\n- Seeing what happens after the truth is out",
+        cta: 'e.g., "I like you. I have for a while."',
+      };
+
+    case "friend":
+      return {
+        memories: "- The chaotic day we still laugh about\n- The time you had my back\n- The random moment that explains our friendship perfectly",
+        insideJokes: "- Our weird nickname\n- The phrase only we understand\n- That story nobody else needs to hear",
+        qualities: "- Funny\n- Loyal\n- Real\n- Slightly dramatic in the best way",
+        futurePlans: "- More random calls\n- More wins together\n- Staying close even when life gets busy",
+        cta: 'e.g., "Basically, you are stuck with me."',
+      };
+
+    case "faith":
+      return {
+        memories: "- A season God carried us through\n- A prayer that was answered slowly\n- A moment that strengthened my faith",
+        insideJokes: "- A church moment we still laugh about\n- A phrase that reminds us to keep trusting",
+        qualities: "- Faithful\n- Steady\n- Prayerful\n- Full of grace",
+        futurePlans: "- Praying for your peace\n- Trusting God with what comes next\n- Believing this season still has purpose",
+        cta: 'e.g., "I am praying for you, gently and sincerely."',
+      };
+
     case "love":
     default:
       return {
@@ -346,6 +436,33 @@ function getSuggestions(occasionKey: string) {
         futurePlans: "- Trip to Abuja\n- Start the business together\n- Movie night every Friday",
         cta: 'e.g., "Be my Valentine tonight"',
       };
+  }
+}
+
+function getFutureFieldLabel(occasionKey: string) {
+  switch (occasionKey) {
+    case "apology":
+      return "Accountability / repair (one per line)";
+    case "closure":
+    case "ex":
+      return "What you are releasing or accepting (one per line)";
+    case "situationship":
+    case "confession":
+      return "What you want to say next (one per line)";
+    case "miss-you":
+      return "What you miss or hope for (one per line)";
+    case "thank-you":
+      return "Impact / appreciation (one per line)";
+    case "friend":
+      return "More memories or promises (one per line)";
+    case "faith":
+      return "Prayers / hopes (one per line)";
+    case "congratulations":
+      return "Future wishes (one per line)";
+    case "love":
+      return "Future plans (one per line)";
+    default:
+      return "Hopes / prayers / future wishes (one per line)";
   }
 }
 
@@ -367,6 +484,7 @@ export default function OccasionCreatePage() {
   const [tone, setTone] = useState("");
   const [length, setLength] = useState<Length>("medium");
   const [privateDetailLevel, setPrivateDetailLevel] = useState<Privacy>("medium");
+  const [occasionDetails, setOccasionDetails] = useState("");
 
   const [memoriesText, setMemoriesText] = useState("");
   const [insideJokesText, setInsideJokesText] = useState("");
@@ -412,6 +530,8 @@ export default function OccasionCreatePage() {
         recipientType: recipientType || undefined,
         tone,
         length,
+        qualityTier: "standard",
+        occasionDetails: occasionDetails.trim() || undefined,
         privateDetailLevel,
         memories: toList(memoriesText),
         insideJokes: toList(insideJokesText),
@@ -475,7 +595,7 @@ export default function OccasionCreatePage() {
         </p>
       </div>
 
-      <form onSubmit={onSubmit} autoComplete="off" style={{ display: "grid", gap: 16 }}>
+      <form id="letter-form" onSubmit={onSubmit} autoComplete="off" style={{ display: "grid", gap: 16 }}>
         {/* Card 1 */}
         <section
           style={{
@@ -564,7 +684,6 @@ export default function OccasionCreatePage() {
                 >
                   <option value="short" style={optionStyle}>Short</option>
                   <option value="medium" style={optionStyle}>Medium</option>
-                  <option value="long" style={optionStyle}>Long</option>
                 </select>
               </div>
             </div>
@@ -627,6 +746,22 @@ export default function OccasionCreatePage() {
             </div>
           )}
 
+          {occasion.key === "congratulations" ? (
+            <div style={{ marginTop: 12 }}>
+              <label style={labelStyle}>What are you congratulating them for?</label>
+              <input
+                required
+                value={occasionDetails}
+                onChange={(e) => setOccasionDetails(e.target.value)}
+                placeholder="e.g., Graduating from university, getting a new job, winning an award, starting a business"
+                style={inputStyle}
+                autoComplete="off"
+                name="occasion_details"
+                id="occasion_details"
+              />
+            </div>
+          ) : null}
+
           <div style={{ marginTop: 12 }}>
             <label style={labelStyle}>Detail level</label>
             <select
@@ -639,6 +774,7 @@ export default function OccasionCreatePage() {
               <option value="high" style={optionStyle}>High detail</option>
             </select>
           </div>
+
         </section>
 
         {/* Card 2 */}
@@ -676,7 +812,7 @@ export default function OccasionCreatePage() {
           />
 
           <FieldBlock
-            label={occasion.key === "love" ? "Future plans (one per line)" : "Hopes / prayers / future wishes (one per line)"}
+            label={getFutureFieldLabel(occasion.key)}
             value={futurePlansText}
             onChange={setFuturePlansText}
             placeholder={suggestions.futurePlans}
@@ -711,7 +847,7 @@ export default function OccasionCreatePage() {
                 onChange={(e) => setExtraEmotional(e.target.checked)}
                 style={{ width: 18, height: 18 }}
                 />
-                Make it extra emotional 🥹
+                Make it extra emotional ✨
             </label>
         </div>
         </section>

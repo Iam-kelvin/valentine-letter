@@ -69,10 +69,15 @@ const InputSchema = z.object({
   occasion: z.string().min(1),
   senderName: z.string().min(1),
   recipientName: z.string().min(1),
+  relationship: z.string().optional(),
   senderRole: z.string().optional(),
   recipientType: z.string().optional(),
   tone: z.string().optional(),
   length: z.string(),
+  qualityTier: z.enum(["standard", "premium", "signature"]).default("standard"),
+  languageMode: z.string().optional(),
+  nativeLanguage: z.string().optional(),
+  occasionDetails: z.string().optional(),
   privateDetailLevel: z.string(),
   memories: z.array(z.string()).optional(),
   insideJokes: z.array(z.string()).optional(),
@@ -92,7 +97,25 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const input = InputSchema.parse(body);
+    const parsed = InputSchema.parse(body);
+    const requestedQualityTier =
+      parsed.qualityTier === "signature" ? "premium" : parsed.qualityTier;
+    const forcedQualityTier =
+      process.env.NODE_ENV !== "production" &&
+      process.env.LETTERLY_FORCE_QUALITY_TIER === "premium"
+        ? "premium"
+        : requestedQualityTier;
+    const input = {
+      ...parsed,
+      senderRole: parsed.senderRole ?? parsed.relationship,
+      qualityTier: forcedQualityTier,
+      languageMode: parsed.languageMode ?? "english",
+      nativeLanguage: parsed.nativeLanguage ?? undefined,
+    };
+
+    if (process.env.NODE_ENV !== "production") {
+      console.info("[Letterly] generation qualityTier:", input.qualityTier);
+    }
 
     if (input.expiresAt) {
       const t = new Date(input.expiresAt).getTime();
@@ -120,6 +143,10 @@ export async function POST(req: Request) {
       recipientName: input.recipientName,
       passwordHash,
       expiresAt: input.expiresAt ?? null,
+      qualityTier: input.qualityTier,
+      languageMode: input.languageMode,
+      nativeLanguage: input.nativeLanguage ?? null,
+      isPremium: input.qualityTier === "premium",
     });
 
     return NextResponse.json({ slug });
