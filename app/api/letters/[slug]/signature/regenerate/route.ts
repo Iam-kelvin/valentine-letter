@@ -50,13 +50,13 @@ export async function POST(
     }
 
     if (!isPremium) {
-      return NextResponse.json({ error: "Upgrade to Signature Letter first." }, { status: 402 });
+      return NextResponse.json({ error: "Upgrade to Premium first." }, { status: 402 });
     }
 
     const regenerateCount = Number((row as any).signature_regenerate_count ?? 0);
     if (regenerateCount >= SIGNATURE_REGENERATE_LIMIT) {
       return NextResponse.json(
-        { error: "This Signature Letter has reached its regenerate limit." },
+        { error: "This Premium Letter has reached its regenerate limit." },
         { status: 403 }
       );
     }
@@ -68,12 +68,12 @@ export async function POST(
       recipientName: (row as any).recipient_name ?? "Recipient",
       tone: "warm, personal, polished",
       length: "long",
-      qualityTier: "signature",
+      qualityTier: "premium",
       privateDetailLevel: "high",
       languageMode: (row as any).language_mode ?? "english",
       nativeLanguage: (row as any).native_language ?? undefined,
       occasionDetails:
-        "Regenerate this Signature Letter using the current edited version as the source. Preserve the meaning, names, and emotional intent while improving flow.",
+        "Regenerate this Premium Letter using the current edited version as the source. Preserve the meaning, names, and emotional intent while improving flow.",
       memories: [
         `Current title: ${body.title}`,
         `Current preview: ${body.preview}`,
@@ -81,7 +81,7 @@ export async function POST(
         body.ps ? `Current PS: ${body.ps}` : "",
       ].filter(Boolean),
       callToAction:
-        "Keep this as a premium Signature Letter. Do not make it theatrical or oversized; keep it human, grounded, and emotionally specific.",
+        "Keep this as a Premium Letter. Do not make it theatrical or oversized; keep it human, grounded, and emotionally specific.",
     });
 
     const updated = await updateSignatureAddOns({

@@ -4,6 +4,9 @@ import type { SignatureFont, SignatureMusic, SignaturePhoto, SignatureTheme } fr
 export const SIGNATURE_EDIT_LIMIT = 5;
 export const SIGNATURE_REGENERATE_LIMIT = 2;
 
+export type PaymentProvider = "paystack" | "stripe";
+export type PaymentStatus = "pending" | "paid" | "failed";
+
 export async function saveLetter(data: {
   slug: string;
   userId: string;
@@ -197,6 +200,146 @@ export async function updateSignatureAddOns(data: {
   return rows[0] ?? null;
 }
 
+export async function createPaymentAttempt(data: {
+  slug: string;
+  userId: string;
+  provider: PaymentProvider;
+  providerReference: string;
+  amount: number;
+  currency: string;
+  email: string;
+}) {
+  await ensurePaymentsTable();
+
+  const { rows } = await sql`
+    INSERT INTO letter_payments (
+      slug, user_id, provider, provider_reference,
+      amount, currency, email, status
+    )
+    VALUES (
+      ${data.slug},
+      ${data.userId},
+      ${data.provider},
+      ${data.providerReference},
+      ${data.amount},
+      ${data.currency.toUpperCase()},
+      ${data.email},
+      'pending'
+    )
+    RETURNING *
+  `;
+
+  return rows[0] ?? null;
+}
+
+export async function updatePaymentCheckout(data: {
+  providerReference: string;
+  providerCheckoutId?: string | null;
+  checkoutUrl: string;
+  providerPayload?: unknown;
+}) {
+  await ensurePaymentsTable();
+
+  const payload = data.providerPayload ? JSON.stringify(data.providerPayload) : null;
+
+  const { rows } = await sql`
+    UPDATE letter_payments
+    SET provider_checkout_id = COALESCE(${data.providerCheckoutId ?? null}, provider_checkout_id),
+      checkout_url = ${data.checkoutUrl},
+      provider_payload = COALESCE(${payload}::jsonb, provider_payload),
+      updated_at = NOW()
+    WHERE provider_reference = ${data.providerReference}
+    RETURNING *
+  `;
+
+  return rows[0] ?? null;
+}
+
+export async function getPaymentByReference(providerReference: string) {
+  await ensurePaymentsTable();
+
+  const { rows } = await sql`
+    SELECT *
+    FROM letter_payments
+    WHERE provider_reference = ${providerReference}
+    LIMIT 1
+  `;
+
+  return rows[0] ?? null;
+}
+
+export async function getPaymentByCheckoutId(provider: PaymentProvider, providerCheckoutId: string) {
+  await ensurePaymentsTable();
+
+  const { rows } = await sql`
+    SELECT *
+    FROM letter_payments
+    WHERE provider = ${provider}
+      AND provider_checkout_id = ${providerCheckoutId}
+    LIMIT 1
+  `;
+
+  return rows[0] ?? null;
+}
+
+export async function markPaymentPaid(data: {
+  providerReference: string;
+  providerCheckoutId?: string | null;
+  providerPayload?: unknown;
+}) {
+  await ensurePaymentsTable();
+
+  const payload = data.providerPayload ? JSON.stringify(data.providerPayload) : null;
+
+  const { rows } = await sql`
+    UPDATE letter_payments
+    SET status = 'paid',
+      paid_at = COALESCE(paid_at, NOW()),
+      provider_checkout_id = COALESCE(${data.providerCheckoutId ?? null}, provider_checkout_id),
+      provider_payload = COALESCE(${payload}::jsonb, provider_payload),
+      updated_at = NOW()
+    WHERE provider_reference = ${data.providerReference}
+    RETURNING *
+  `;
+
+  return rows[0] ?? null;
+}
+
+export async function markPaymentFailed(data: {
+  providerReference: string;
+  providerPayload?: unknown;
+}) {
+  await ensurePaymentsTable();
+
+  const payload = data.providerPayload ? JSON.stringify(data.providerPayload) : null;
+
+  const { rows } = await sql`
+    UPDATE letter_payments
+    SET status = 'failed',
+      provider_payload = COALESCE(${payload}::jsonb, provider_payload),
+      updated_at = NOW()
+    WHERE provider_reference = ${data.providerReference}
+    RETURNING *
+  `;
+
+  return rows[0] ?? null;
+}
+
+export async function hasSuccessfulPremiumPayment(slug: string, userId: string) {
+  await ensurePaymentsTable();
+
+  const { rows } = await sql`
+    SELECT 1
+    FROM letter_payments
+    WHERE slug = ${slug}
+      AND user_id = ${userId}
+      AND status = 'paid'
+    LIMIT 1
+  `;
+
+  return rows.length > 0;
+}
+
 let metadataColumnsReady = false;
 
 async function ensureLettersMetadataColumns() {
@@ -268,4 +411,42 @@ async function ensureLetterReceiptsTable() {
   `;
 
   receiptTableReady = true;
+}
+
+let paymentsTableReady = false;
+
+async function ensurePaymentsTable() {
+  if (paymentsTableReady) return;
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS letter_payments (
+      id BIGSERIAL PRIMARY KEY,
+      slug TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      provider TEXT NOT NULL,
+      provider_reference TEXT NOT NULL UNIQUE,
+      provider_checkout_id TEXT,
+      amount INTEGER NOT NULL,
+      currency TEXT NOT NULL,
+      email TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      checkout_url TEXT,
+      provider_payload JSONB,
+      paid_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS letter_payments_slug_user_idx
+    ON letter_payments (slug, user_id)
+  `;
+
+  await sql`
+    CREATE INDEX IF NOT EXISTS letter_payments_provider_checkout_idx
+    ON letter_payments (provider, provider_checkout_id)
+  `;
+
+  paymentsTableReady = true;
 }

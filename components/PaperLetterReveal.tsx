@@ -239,7 +239,7 @@ const signaturePalettes: Record<Exclude<SignatureTheme, "auto">, SignaturePalett
     wash:
       "radial-gradient(circle at 20% 12%, rgba(217,199,255,0.30), transparent 34%), radial-gradient(circle at 84% 18%, rgba(80,66,125,0.13), transparent 30%)",
     tape: "rgba(220,210,248,0.74)",
-    label: "Keepsake",
+    label: "Quiet letter",
   },
   "blue-keepsake": {
     accent: "#3f7fbf",
@@ -249,7 +249,7 @@ const signaturePalettes: Record<Exclude<SignatureTheme, "auto">, SignaturePalett
     wash:
       "radial-gradient(circle at 18% 12%, rgba(143,196,232,0.30), transparent 34%), radial-gradient(circle at 84% 20%, rgba(58,112,168,0.15), transparent 30%)",
     tape: "rgba(176,215,241,0.76)",
-    label: "Blue keepsake",
+    label: "Blue letter",
   },
   "garden-note": {
     accent: "#4f8d62",
@@ -952,7 +952,7 @@ function coverLabel(occasion?: string | null) {
   if (occasion === "apology") return "Apology Letter";
   if (occasion === "situationship" || occasion === "cheeky") return "Unfiltered Letter";
   if (occasion === "thank-you" || occasion === "appreciation") return "Thank You Letter";
-  return "Signature Letter";
+  return "Premium Letter";
 }
 
 const coverPillStyle: React.CSSProperties = {

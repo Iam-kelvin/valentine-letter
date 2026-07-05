@@ -130,7 +130,7 @@ function LettersSection({
                     </span>
                     {letterIsPremium ? (
                       <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-black text-rose-100">
-                        Signature
+                        Premium
                       </span>
                     ) : null}
                   </div>

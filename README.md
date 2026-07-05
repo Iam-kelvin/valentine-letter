@@ -14,7 +14,25 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3002](http://localhost:3002) with your browser to see the result.
+
+## Payments
+
+Premium Letter checkout uses Paystack for Nigeria and Stripe for international card payments.
+
+Required production environment variables:
+
+```bash
+PAYSTACK_SECRET_KEY=
+PAYSTACK_PREMIUM_AMOUNT_KOBO=50000
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PREMIUM_AMOUNT_CENTS=500
+STRIPE_PREMIUM_CURRENCY=usd
+NEXT_PUBLIC_APP_URL=
+```
+
+Set the Paystack webhook URL to `/api/payments/paystack/webhook` and the Stripe webhook URL to `/api/payments/stripe/webhook`.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

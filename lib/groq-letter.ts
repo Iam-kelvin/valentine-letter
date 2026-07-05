@@ -570,9 +570,9 @@ function buildQualityTierRules(input: any) {
 
   if (tier === "premium") {
     return `
-Quality tier: signature
+Quality tier: premium
 
-Signature writing rules:
+Premium writing rules:
 - Human is better than perfect. Do not make the writing overly poetic or dramatic.
 - First paragraph must hook emotionally, feel personal, and avoid generic starts like "I just want to say" or "On this special day."
 - Mix short and longer sentences; avoid overly symmetrical sentence patterns.

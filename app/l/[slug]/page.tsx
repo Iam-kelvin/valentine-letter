@@ -157,7 +157,7 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
             }}
           >
             <div style={{ flex: 1 }}>
-              {isPremium ? <div style={signatureBadgeStyle}>Signature Letter</div> : null}
+              {isPremium ? <div style={signatureBadgeStyle}>Premium Letter</div> : null}
 
               <h1
                 style={{
@@ -181,8 +181,8 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
             <div style={{ marginTop: 10 }}>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "flex-end" }}>
                 {isOwner && isPremium ? (
-                  <Link href={`/l/${slug}/signature`} style={editSignatureStyle}>
-                    Edit Signature
+                  <Link href={`/l/${slug}/premium`} style={editSignatureStyle}>
+                    Edit Premium
                   </Link>
                 ) : null}
                 {isOwner ? <ShareButton title={row.title} text={row.preview} /> : null}

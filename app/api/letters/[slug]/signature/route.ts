@@ -49,13 +49,13 @@ export async function POST(
     }
 
     if (!isPremium) {
-      return NextResponse.json({ error: "Upgrade to Signature Letter first." }, { status: 402 });
+      return NextResponse.json({ error: "Upgrade to Premium first." }, { status: 402 });
     }
 
     const editCount = Number((row as any).signature_edit_count ?? 0);
     if (editCount >= SIGNATURE_EDIT_LIMIT) {
       return NextResponse.json(
-        { error: "This Signature Letter has reached its edit limit." },
+        { error: "This Premium Letter has reached its edit limit." },
         { status: 403 }
       );
     }

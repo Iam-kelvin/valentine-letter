@@ -84,7 +84,7 @@ export default function SignatureEditor({
 
   async function save() {
     if (editRemaining <= 0) {
-      setError("This Signature Letter has reached its edit limit.");
+      setError("This Premium Letter has reached its edit limit.");
       return;
     }
 
@@ -114,7 +114,7 @@ export default function SignatureEditor({
 
   async function regenerate() {
     if (regenerateRemaining <= 0) {
-      setError("This Signature Letter has reached its regenerate limit.");
+      setError("This Premium Letter has reached its regenerate limit.");
       return;
     }
 
@@ -155,7 +155,7 @@ export default function SignatureEditor({
 
     const availableSlots = maxPhotos - photos.length;
     if (availableSlots <= 0) {
-      setError("You can keep up to 3 photos on one Signature Letter.");
+      setError("You can keep up to 3 photos on one Premium Letter.");
       return;
     }
 
@@ -191,8 +191,8 @@ export default function SignatureEditor({
     <div style={shellStyle}>
       <div style={headerStyle}>
         <div>
-          <div style={eyebrowStyle}>Signature Letter</div>
-          <h1 style={titleStyle}>Edit Signature</h1>
+          <div style={eyebrowStyle}>Premium Letter</div>
+          <h1 style={titleStyle}>Edit Premium</h1>
           <p style={headerHelpStyle}>
             Make the changes, check the preview, then save.
           </p>

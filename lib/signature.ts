@@ -46,8 +46,8 @@ export const signatureThemes: Array<{ key: SignatureTheme; label: string; hint: 
   { key: "romantic-photobook", label: "Romantic photobook", hint: "Soft collage feel" },
   { key: "memory-album", label: "Memory album", hint: "Warm and personal" },
   { key: "celebration-board", label: "Celebration board", hint: "Bright milestone mood" },
-  { key: "quiet-keepsake", label: "Quiet keepsake", hint: "Calm and intimate" },
-  { key: "blue-keepsake", label: "Blue keepsake", hint: "Cool, polished, calm" },
+  { key: "quiet-keepsake", label: "Quiet letter", hint: "Calm and intimate" },
+  { key: "blue-keepsake", label: "Blue letter", hint: "Cool, polished, calm" },
   { key: "garden-note", label: "Garden note", hint: "Fresh and gentle" },
 ];
 

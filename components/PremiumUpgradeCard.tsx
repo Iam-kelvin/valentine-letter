@@ -19,9 +19,7 @@ const features = [
 
 export default function PremiumUpgradeCard({ slug, preview, recipientName }: Props) {
   const router = useRouter();
-  const [phase, setPhase] = useState<"pitch" | "confirm">("pitch");
-  const [loading, setLoading] = useState(false);
-  const [upgraded, setUpgraded] = useState(false);
+  const [loadingProvider, setLoadingProvider] = useState<"paystack" | "stripe" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const teaser = useMemo(() => {
@@ -29,7 +27,7 @@ export default function PremiumUpgradeCard({ slug, preview, recipientName }: Pro
     const name = recipientName?.trim();
 
     if (cleanPreview) {
-      return `${cleanPreview} Signature keeps the same heart, then adds more detail, rhythm, and a fuller closing.`;
+      return `${cleanPreview} Premium keeps the same heart, then adds more detail, rhythm, and a fuller closing.`;
     }
 
     if (name) {
@@ -39,34 +37,42 @@ export default function PremiumUpgradeCard({ slug, preview, recipientName }: Pro
     return "A fuller version with more detail, rhythm, and a stronger closing.";
   }, [preview, recipientName]);
 
-  async function upgrade() {
-    setLoading(true);
+  async function startCheckout(provider: "paystack" | "stripe") {
+    setLoadingProvider(provider);
     setError(null);
 
     try {
-      const res = await fetch(`/api/letters/${slug}/upgrade`, {
+      const res = await fetch(`/api/letters/${slug}/checkout`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider }),
       });
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        throw new Error(data?.error ?? "Could not upgrade this letter.");
+        throw new Error(data?.error ?? "Could not start checkout.");
       }
 
-      setUpgraded(true);
-      router.refresh();
+      if (data?.redirectUrl) {
+        router.push(data.redirectUrl);
+        return;
+      }
+
+      if (!data?.authorizationUrl) {
+        throw new Error("Checkout did not return a payment link.");
+      }
+
+      window.location.href = data.authorizationUrl;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not upgrade this letter.");
+      setError(err instanceof Error ? err.message : "Could not start checkout.");
     } finally {
-      setLoading(false);
+      setLoadingProvider(null);
     }
   }
 
-  if (upgraded) return null;
-
   return (
-    <section style={cardStyle} aria-label="Signature Letter upgrade">
-      <div style={eyebrowStyle}>Signature Letter</div>
+    <section style={cardStyle} aria-label="Premium Letter upgrade">
+      <div style={eyebrowStyle}>Premium Letter</div>
       <div style={contentGridStyle}>
         <div>
           <h2 style={titleStyle}>Make this more personal, deeper, and more powerful</h2>
@@ -78,58 +84,50 @@ export default function PremiumUpgradeCard({ slug, preview, recipientName }: Pro
         </div>
 
         <div style={panelStyle}>
-          {phase === "pitch" ? (
-            <>
-              <ul style={listStyle}>
-                {features.map((feature) => (
-                  <li key={feature} style={listItemStyle}>
-                    <span style={dotStyle} aria-hidden="true" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+          <ul style={listStyle}>
+            {features.map((feature) => (
+              <li key={feature} style={listItemStyle}>
+                <span style={dotStyle} aria-hidden="true" />
+                {feature}
+              </li>
+            ))}
+          </ul>
 
-              <button
-                type="button"
-                onClick={() => setPhase("confirm")}
-                disabled={loading}
-                style={buttonStyle}
-              >
-                Unlock Signature Letter
-              </button>
+          <div style={paymentHeaderStyle}>Unlock Premium Letter</div>
+          <p style={paymentBodyStyle}>
+            Pay once for this letter. The same share link updates to the Premium version after
+            payment.
+          </p>
 
-              <p style={secondaryStyle}>You can still send the standard version for free.</p>
-            </>
-          ) : (
-            <div>
-              <div style={paymentHeaderStyle}>Unlock Signature Letter</div>
-              <p style={paymentBodyStyle}>
-                Signature checkout is being set up. For this launch, you can create the
-                Signature version now and keep the same share link.
-              </p>
+          <div style={paymentLineStyle}>
+            <span>Nigeria</span>
+            <strong>{"\u20A6"}500</strong>
+          </div>
 
-              <div style={paymentLineStyle}>
-                <span>Signature Letter</span>
-                <strong>Beta access</strong>
-              </div>
+          <button
+            type="button"
+            onClick={() => void startCheckout("paystack")}
+            disabled={!!loadingProvider}
+            style={buttonStyle}
+          >
+            {loadingProvider === "paystack" ? "Opening Paystack..." : "Pay with Paystack"}
+          </button>
 
-              <button type="button" onClick={upgrade} disabled={loading} style={buttonStyle}>
-                {loading ? "Creating Signature Letter..." : "Create Signature Letter"}
-              </button>
+          <div style={{ ...paymentLineStyle, marginTop: 12 }}>
+            <span>International</span>
+            <strong>$5</strong>
+          </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setPhase("pitch");
-                  setError(null);
-                }}
-                disabled={loading}
-                style={backButtonStyle}
-              >
-                Back
-              </button>
-            </div>
-          )}
+          <button
+            type="button"
+            onClick={() => void startCheckout("stripe")}
+            disabled={!!loadingProvider}
+            style={secondaryButtonStyle}
+          >
+            {loadingProvider === "stripe" ? "Opening Stripe..." : "Pay with card"}
+          </button>
+
+          <p style={secondaryStyle}>You can still send the standard version for free.</p>
 
           {error ? <p style={errorStyle}>{error}</p> : null}
         </div>
@@ -232,6 +230,14 @@ const buttonStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
+const secondaryButtonStyle: React.CSSProperties = {
+  ...buttonStyle,
+  marginTop: 0,
+  border: "1px solid rgba(255,255,255,0.16)",
+  background: "rgba(255,255,255,0.08)",
+  color: "#fff",
+};
+
 const secondaryStyle: React.CSSProperties = {
   margin: "10px 0 0",
   color: "rgba(255,255,255,0.62)",
@@ -263,18 +269,6 @@ const paymentLineStyle: React.CSSProperties = {
   padding: "12px 13px",
   color: "rgba(255,255,255,0.82)",
   fontSize: 14,
-};
-
-const backButtonStyle: React.CSSProperties = {
-  width: "100%",
-  minHeight: 42,
-  marginTop: 9,
-  borderRadius: 14,
-  border: "1px solid rgba(255,255,255,0.14)",
-  background: "transparent",
-  color: "rgba(255,255,255,0.76)",
-  fontWeight: 800,
-  cursor: "pointer",
 };
 
 const errorStyle: React.CSSProperties = {
