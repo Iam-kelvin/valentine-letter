@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { getLetter, hasSuccessfulPremiumPayment } from "@/lib/db";
+import { getLetter } from "@/lib/db";
 import { upgradeLetterToPremium } from "@/lib/premium-letter";
 
 type LetterRow = {
@@ -39,10 +39,11 @@ export async function POST(
       return NextResponse.json({ ok: true, slug, alreadyPremium: true });
     }
 
-    const paid = await hasSuccessfulPremiumPayment(slug, userId);
-    if (!paid) {
-      return NextResponse.json({ error: "Payment is required to unlock Premium." }, { status: 402 });
-    }
+    // Temporary production bypass: let Premium be simulated while checkout is paused.
+    // const paid = await hasSuccessfulPremiumPayment(slug, userId);
+    // if (!paid) {
+    //   return NextResponse.json({ error: "Payment is required to unlock Premium." }, { status: 402 });
+    // }
 
     await upgradeLetterToPremium({ slug, userId });
 

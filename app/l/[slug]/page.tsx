@@ -213,15 +213,15 @@ export default async function LetterPage({ params }: { params: Promise<{ slug: s
           ctaBody="Now go make one for your person in seconds."
           ctaButtonText={"Create my letter \u{1F48C}"}
           signatureAddOns={signatureAddOns}
-        />
-
-        {isOwner && !isPremium ? (
-          <PremiumUpgradeCard
-            slug={slug}
-            preview={row.preview}
-            recipientName={(row as any).recipient_name ?? (row as any).recipientName ?? null}
-          />
-        ) : null}
+        >
+          {isOwner && !isPremium ? (
+            <PremiumUpgradeCard
+              slug={slug}
+              preview={row.preview}
+              recipientName={(row as any).recipient_name ?? (row as any).recipientName ?? null}
+            />
+          ) : null}
+        </PaperLetterReveal>
       </div>
     </main>
   );

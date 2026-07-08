@@ -8,9 +8,9 @@ export const premiumPrices = {
     label: "\u20A6500",
   },
   stripe: {
-    amount: Number(process.env.STRIPE_PREMIUM_AMOUNT_CENTS ?? 500),
+    amount: Number(process.env.STRIPE_PREMIUM_AMOUNT_CENTS ?? 499),
     currency: (process.env.STRIPE_PREMIUM_CURRENCY ?? "usd").toLowerCase(),
-    label: "$5",
+    label: "$4.99",
   },
 };
 

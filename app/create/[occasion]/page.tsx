@@ -675,17 +675,6 @@ export default function OccasionCreatePage() {
                 </select>
               </div>
 
-              <div>
-                <label style={labelStyle}>Length</label>
-                <select
-                  value={length}
-                  onChange={(e) => setLength(e.target.value as Length)}
-                  style={selectStyle}
-                >
-                  <option value="short" style={optionStyle}>Short</option>
-                  <option value="medium" style={optionStyle}>Medium</option>
-                </select>
-              </div>
             </div>
           ) : (
             <div
@@ -774,6 +763,9 @@ export default function OccasionCreatePage() {
               <option value="high" style={optionStyle}>High detail</option>
             </select>
           </div>
+
+          <LengthSelector value={length} onChange={setLength} />
+          <PremiumOptionsTeaser />
 
         </section>
 
@@ -946,6 +938,65 @@ function FieldBlock({
   );
 }
 
+function LengthSelector({
+  value,
+  onChange,
+}: {
+  value: Length;
+  onChange: (value: Length) => void;
+}) {
+  return (
+    <div style={{ marginTop: 14 }}>
+      <label style={labelStyle}>Length</label>
+      <div style={lengthGridStyle}>
+        <button
+          type="button"
+          onClick={() => onChange("short")}
+          style={lengthOptionStyle(value === "short")}
+        >
+          <span>Short</span>
+          <small>Quick and sweet</small>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onChange("medium")}
+          style={lengthOptionStyle(value === "medium")}
+        >
+          <span>Medium</span>
+          <small>Standard free letter</small>
+        </button>
+
+        <button
+          type="button"
+          disabled
+          style={premiumLengthStyle}
+          title="Premium long letters unlock after the standard draft is created."
+        >
+          <span>
+            Long <b style={premiumBadgeStyle}>Premium</b>
+          </span>
+          <small>Unlock after draft</small>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function PremiumOptionsTeaser() {
+  return (
+    <div style={premiumTeaserStyle}>
+      <div>
+        <strong>Premium options after your draft</strong>
+        <p>
+          Longer rewrite, limited edits, photo styling, font choices, and soundtrack controls.
+        </p>
+      </div>
+      <span style={premiumPriceStyle}>From {"\u20A6"}500 / $4.99</span>
+    </div>
+  );
+}
+
 // const labelStyle: React.CSSProperties = {
 //   display: "block",
 //   marginBottom: 8,
@@ -996,6 +1047,77 @@ const twoColumnGridStyle: React.CSSProperties = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   gap: 10,
+};
+
+const lengthGridStyle: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+  gap: 10,
+};
+
+function lengthOptionStyle(active: boolean): React.CSSProperties {
+  return {
+    display: "grid",
+    gap: 4,
+    minHeight: 78,
+    borderRadius: 14,
+    border: active ? "1px solid rgba(255,255,255,0.42)" : "1px solid rgba(255,255,255,0.14)",
+    background: active ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.06)",
+    color: "inherit",
+    padding: "12px 13px",
+    textAlign: "left",
+    cursor: "pointer",
+    fontWeight: 850,
+  };
+}
+
+const premiumLengthStyle: React.CSSProperties = {
+  display: "grid",
+  gap: 4,
+  minHeight: 78,
+  borderRadius: 14,
+  border: "1px solid rgba(255,195,209,0.32)",
+  background: "rgba(255,195,209,0.08)",
+  color: "inherit",
+  padding: "12px 13px",
+  textAlign: "left",
+  cursor: "not-allowed",
+  opacity: 0.86,
+  fontWeight: 850,
+};
+
+const premiumBadgeStyle: React.CSSProperties = {
+  display: "inline-flex",
+  marginLeft: 6,
+  borderRadius: 999,
+  border: "1px solid rgba(255,195,209,0.44)",
+  background: "rgba(255,195,209,0.12)",
+  color: "#ffc3d1",
+  padding: "2px 6px",
+  fontSize: 11,
+};
+
+const premiumTeaserStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 14,
+  flexWrap: "wrap",
+  marginTop: 14,
+  borderRadius: 16,
+  border: "1px solid rgba(255,195,209,0.18)",
+  background: "rgba(255,195,209,0.06)",
+  padding: "13px 14px",
+};
+
+const premiumPriceStyle: React.CSSProperties = {
+  borderRadius: 999,
+  border: "1px solid rgba(255,255,255,0.14)",
+  background: "rgba(0,0,0,0.18)",
+  padding: "8px 10px",
+  color: "#ffc3d1",
+  fontSize: 13,
+  fontWeight: 900,
 };
 
 const inputStyle: React.CSSProperties = {

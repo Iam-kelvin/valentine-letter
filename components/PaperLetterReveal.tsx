@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import LetterCelebration from "./LetterCelebration";
 import {
   getSignatureAccentFontFamily,
@@ -36,6 +36,7 @@ type Props = {
   ctaBody?: string;
   ctaButtonText?: string;
   signatureAddOns?: SignatureAddOns | null;
+  children?: ReactNode;
 };
 
 type OccasionTheme = {
@@ -996,6 +997,7 @@ export default function PaperLetterReveal({
   ctaTitle = "Aww \u{1F60C} Want one like this?",
   ctaBody = "Now go make one for your person in seconds.",
   ctaButtonText = "Create my letter \u{1F48C}",
+  children,
 }: Props) {
   const [opened, setOpened] = useState(false);
   const [typedText, setTypedText] = useState("");
@@ -1777,6 +1779,8 @@ export default function PaperLetterReveal({
           </div>
         </div>
       )}
+
+      {opened && children ? <div style={{ marginTop: 28 }}>{children}</div> : null}
     </div>
   );
 }
