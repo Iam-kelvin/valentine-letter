@@ -57,7 +57,7 @@
 
 // export async function generateLetterWithGroq(input: any) {
 //   const resp = await client.chat.completions.create({
-//     model: "llama-3.3-70b-versatile",
+//     model: "openai/gpt-oss-120b",
 //     temperature: 0.7,
 //     messages: [{ role: "user", content: buildPrompt(input) }],
 //     response_format: { type: "json_object" } as any
@@ -80,6 +80,9 @@ const client = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
   baseURL: "https://api.groq.com/openai/v1",
 });
+
+const LETTER_MODEL =
+  process.env.LETTER_MODEL || "openai/gpt-oss-120b";
 
 const OutputSchema = z.object({
   title: z.string().min(1).max(80),
@@ -838,7 +841,7 @@ async function callGroq(input: any, fix?: string) {
     .join("\n\n");
 
   const resp = await client.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
+    model: "openai/gpt-oss-120b",
     temperature: 0.7,
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" } as any,
